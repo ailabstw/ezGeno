@@ -1,7 +1,7 @@
 # ezGeno
 Implementation of a deep convolutional neuronal network for predicting chromatin features from DNA sequence.
 
-The repository contains a flexible tensorflow implementation of a convolutional neuronal network with max pooling. The basic architecture is built on the principles described in DeepSEA (http://deepsea.princeton.edu/help/) and Basset (https://github.com/davek44/Basset). It is comprised of multiple layers of convolutional filters followed by ReLU and max pooling and a fully connected layer in the end. An additional pre-final fully connected layer can be switch on as well. The number of convolutional layers is flexible and selected as hyperparameter in the beginning of the training procedure. Batch normalization is optional.
+The repository contains a flexible tensorflow implementation of a convolutional neuronal network with max pooling. The basic architecture is built on the principles described in DeepBind (https://github.com/kundajelab/deepbind) .
 
 
 ### Contents
