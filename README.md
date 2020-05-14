@@ -23,9 +23,13 @@ usage: ezgeno.py  [-h help]
                   [--negative_training_data NEGATIVE_TR_DATA]
                   [--search NAS_SEARCH] [--epochs EPOCHS] 
                   [--batch_size BATCH_SIZE] [--learning_rate LEARNING_RATE] 
+                  [--supernet_learning_rate SUPERNET_LEARNING_RATE] 
+                  [--controller_learning_rate CONTROLLER_LEARNING_RATE] 
                   [--momentum MOMENTUM] [--weight_decay WEIGHT_DECAY] 
                   [--optimizer OPTIMIZER] [--weight_init WEIGHT_INITILIZATION]
-                  [--negative OUT_PATH]
+                  [--negative_data_method NEGATIVE_DATA_METHOD] 
+                  [--search_cost SEARCH_COST]
+                  [--supernet_epochs SUPERNET_EPOCHS]
                   [--out_path OUT_PATH]
                   
                   
@@ -36,7 +40,7 @@ Required arguments:
 Optional arguments:
   -h, --help            
                         Show this help message and exit
-  --negative_data_generation    
+  --negative_data_method NEGATIVE_DATA_METHOD  
                         If not given the negative training data, ezGeno will generate 
                         negative data based on the selected methods.
                         "random": random sampling from the human genome.
@@ -51,22 +55,37 @@ Optional arguments:
                         [Type: Flag]
   --epochs EPOCHS
                         Number of epochs for training models. 
-                        [Type: Int, default: 50]
+                        [Type: Int, default: 100]
   --batch_size BATCH_SIZE
                         Batch size for each training iterations. 
                         [Type: Int, default: 50]
   --learning_rate LEARNING_RATE         
                         Learning rate for training models. 
                         [Type: Float, default: 0.001]
+  --supernet_learning_rate SUPERNET_LEARNING_RATE         
+                        Learning rate for supernet search models. 
+                        [Type: Float, default: 0.01]
+  --controller_learning_rate CONTROLLER_LEARNING_RATE         
+                        Learning rate during controller phase. 
+                        [Type: Float, default: 0.1]
   --momentum MOMENTUM
                         Learning rate for training models. 
-                        [Type: Float, default: 0.99]
+                        [Type: Float, default: 0.9]
+  --weight_decay WEIGHT_DECAY
+                        Weight decay. 
+                        [Type: Float, default: 0.0005]  
   --optimizer OPTIMIZER
                         Optimizer used for model training. 
-                        [Type: String, default: "Adam"]
+                        [Type: String, default: "sgd", options: "sgd, adam, adagrad"]
   --weight_init WEIGHT_INITILIZATION
                         Method used for weight initilization. 
                         [Type: String, default: "Normal"]
+  --search_cost SEARCH_COST
+                        Two kinds of pre-defined search cost parameter sets. 
+                        [Type: String, default: "Fast", options: "fast, best"]
+  --supernet_epochs SUPERNET_EPOCHS
+                        Number of epochs for supernet search. 
+                        [Type: Int, default: 50]
   --out_path OUT_PATH   
                         The output directory for the trained model. 
                         [Type: String, default: "output_dir"]
