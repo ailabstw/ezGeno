@@ -25,17 +25,27 @@ usage: ezgeno.py  [-h help]
                   [--batch_size BATCH_SIZE] [--learning_rate LEARNING_RATE] 
                   [--momentum MOMENTUM] [--weight_decay WEIGHT_DECAY] 
                   [--optimizer OPTIMIZER] [--weight_init WEIGHT_INITILIZATION]
+                  [--negative OUT_PATH]
                   [--out_path OUT_PATH]
+                  
                   
 Required arguments:
   --positive_training_data    
-                        positive training data in fasta format (Format: *.fa, *.fasta)
-  --negative_training_data    
-                        negative training data in fasta format (Format: *.fa, *.fasta)
-  
+                        positive training data in fasta (*.fa, *.fasta) format. 
+                        [Type: String]  
 Optional arguments:
   -h, --help            
                         Show this help message and exit
+  --negative_data_generation    
+                        If not given the negative training data, ezGeno will generate 
+                        negative data based on the selected methods.
+                        "random": random sampling from the human genome.
+                        "dinucl": generate negative sequence based on same dinucleotide
+                                  composition with the positive training data.
+                        [Type: String, Default:"dinucl", options: "random, dinucl"]
+  --negative_training_data    
+                        negative training data in fasta (*.fa, *.fasta) format.
+                        [Type: String]
   --search NAS_SEARCH
                         Performing Neural architectural search. 
                         [Type: Flag]
@@ -62,7 +72,22 @@ Optional arguments:
                         [Type: String, default: "output_dir"]
 ```
 
-### Data description
+
+## Installation
+1) Download/Clone ezGeno
+```bash
+git clone https://github.com/ailabstw/ezGeno.git
+
+cd ezGeno
+```
+
+2) Install required packages
+```bash
+pip3 install torch
+apt-get install bedtools
+```
+
+### Dataset
 
 
 ### Models
