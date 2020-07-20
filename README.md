@@ -9,10 +9,34 @@ The repository contains a flexible pytorch implementation of a eNAS algorithm, w
 * **ezGeno.py** : Model file, implementation of the model. Flexible construction according to hyperparameters provided.
 
 ### Requirements
-#### Packages
-* Python 3.5 +
-* Pytorch 1.4 +
+
+#### Packages (refer from requirements.txt)
+* biopython==1.77
+* cycler==0.10.0
+* future==0.18.2
+* joblib==0.16.0
+* kiwisolver==1.2.0
+* matplotlib==3.3.0
+* numpy==1.19.0
+* opencv-python==4.3.0.36
+* pandas==1.0.5
+* Pillow==7.2.0
+* pyparsing==2.4.7
+* python-dateutil==2.8.1
+* pytz==2020.1
+* scikit-learn==0.23.1
+* scipy==1.5.1
+* seaborn==0.10.1
+* six==1.15.0
+* sklearn==0.0
+* threadpoolctl==2.1.0
+* torch==1.5.1
+* torchvision==0.6.1
+* tqdm==4.48.0
+* utils==1.0.1
+
 * Bedtools (Tested on 2.28.0)
+
 #### Input data
 * Pre-processed peak files 
 
@@ -98,12 +122,17 @@ Optional arguments:
 git clone https://github.com/ailabstw/ezGeno.git
 
 cd ezGeno
+
 ```
 
 2) Install required packages
 ```bash
-pip3 install torch
 apt-get install bedtools
+apt-get install python3
+apt-get install python3-distutils
+apt-get install libglib2.0-0
+apt-get install -y libsm6 libxext6 libxrender-dev
+pip3 install -r requirements.txt
 ```
 
 ### Dataset
