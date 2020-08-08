@@ -255,19 +255,19 @@ Please refer to the ReadMe file in the preprocessing folder
 ```python
  python3 ezgeno.py --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
  ```
-#### modify layers parameters 
+#### (optional) modify layers parameters 
 ```python
  python3 ezgeno.py --layers 6 --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
  ```
-#### modify search space (convolution filter size) parameters 
+#### (optional) modify search space (convolution filter size) parameters 
 ```python
  python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19] --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa  
  ```
-#### modify the number of output channels parameters 
+#### (optional) modify the number of output channels parameters 
 ```python
  python3 ezgeno.py --feature_dim 128 --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
  ```
-#### load model and predict
+#### (optional) load model and predict
 ```python
  python3 ezgeno.py --load model.t7 --cuda 0 --eval --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
 ```
@@ -275,7 +275,7 @@ Please refer to the ReadMe file in the preprocessing folder
 ```python
  python3 visualize.py --load model.t7 --data_path ../SUZ12/SUZ12_positive_test.fa --dataName SUZ12 --target_layer_names "[2]"
 ``` 
-#### you can choose sequence range which you want to show based on "show_seq" parameter. e.g.all,top-100,50-200
+#### (optional) you can choose sequence range which you want to show based on "show_seq" parameter. e.g.all,top-100,50-200
 ```python
  python3 visualize.py --show_seq top-200 --load model.t7 --data_path ../SUZ12/SUZ12_positive_test.fa --dataName SUZ12 --target_layer_names "[2]"
 ``` 
