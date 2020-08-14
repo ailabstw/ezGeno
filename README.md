@@ -277,9 +277,9 @@ Please refer to the ReadMe file in the preprocessing folder
 ```
 ### Performance evaluaion:
 
-![AUC curve](https://github.com/p568912/ezgeno/blob/master/model_comparision.png)
+![AUC curve](https://github.com/ailabstw/ezGeno/blob/master/model_comparision.png)
 
-![time cost](https://github.com/p568912/ezgeno/blob/master/compare_with_methods_time.png)
+![time cost](https://github.com/ailabstw/ezGeno/blob/master/compare_with_methods_time.png)
 
 ### 3. visualize and get sub sequence based on prediction model 
 ```python
@@ -294,11 +294,11 @@ Please refer to the ReadMe file in the preprocessing folder
 
 We highlight the important region in each sequence based on the predictive model. As shown in the image below, our model is able to identify regions that are important to determining possible binding sites.
 
-![seq-heatmap](https://github.com/p568912/ezgeno/blob/master/seq-heapmap.jpg)
+![seq-heatmap](https://github.com/ailabstw/ezGeno/blob/master/seq-heapmap.jpg)
 
 We also collect the sub-sequences whose scores surpass the threshold and save them in fasta format. This file can be treated as the input to a motif discovery tool (e.g. meme) to generate motif in sub sequences. As shown in the image below, the left sequence logo is based on motif discovery from these sub sequences, and the right sequence logo is from hocomoco database. We can find a reliable and consistent result using our tool.
 
-![seq-heatmap](https://github.com/p568912/ezgeno/blob/master/motif_discovery_compare_example.jpg)
+![seq-heatmap](https://github.com/ailabstw/ezGeno/blob/master/motif_discovery_compare_example.jpg)
 
  
 ## Example2 - Enhancer Activity:
@@ -316,7 +316,7 @@ python3 ezgeno.py --task epigenome --cuda 0 --train_dNase_path ../dNase/h1hesc_d
 ``` 
 
 ### Performance Evaluation
-![AUC curve](https://github.com/p568912/ezgeno/blob/master/active_enhancer_AUC.png)
+![AUC curve](https://github.com/ailabstw/ezGeno/blob/master/active_enhancer_AUC.png)
 
-![time cost](https://github.com/p568912/ezgeno/blob/master/active_enhancer_time.png)
+![time cost](https://github.com/ailabstw/ezGeno/blob/master/active_enhancer_time.png)
 
