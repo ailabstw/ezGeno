@@ -5,6 +5,8 @@ This repository contains a pytorch implementation of an eNAS algorithm, where pa
 * predicting TF binding. The basic architecture of this idea was built based on DeepBind (https://github.com/kundajelab/deepbind).
 * predicting activity of enhancers. The basic architecture of this idea was built based on accuEnhancer.
 
+## workfolw
+
 ### Contents
 
 *  **network.py**          : Model file, implementation of the model. Flexible construction according to hyperparameters provided.
@@ -246,36 +248,44 @@ pip3 install -r requirements.txt
 **./models** contains links of previous trained models.
 
 
+### Model Archietcture
 
 
 ## Example1 - TFBind:
+users can run a sample dataset with the following: "./example/tfbind/run.sh".
 ### 1. preprocesing
 Please refer to the ReadMe file in the preprocessing folder
 ### 2. eNAS
 ```python
  python3 ezgeno.py --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
  ```
-#### modify layers parameters 
+#### (optional) modify layers parameters 
 ```python
  python3 ezgeno.py --layers 6 --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
  ```
-#### modify search space (convolution filter size) parameters 
+#### (optional) modify search space (convolution filter size) parameters 
 ```python
  python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19] --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa  
  ```
-#### modify the number of output channels parameters 
+#### (optional) modify the number of output channels parameters 
 ```python
  python3 ezgeno.py --feature_dim 128 --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
  ```
-#### load model and predict
+#### (optional) load model and predict
 ```python
  python3 ezgeno.py --load model.t7 --cuda 0 --eval --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
 ```
+### Performance evaluaion:
+
+![AUC curve](https://github.com/p568912/ezgeno/blob/master/model_comparision.png)
+
+![time cost](https://github.com/p568912/ezgeno/blob/master/compare_with_methods_time.png)
+
 ### 3. visualize and get sub sequence based on prediction model 
 ```python
  python3 visualize.py --load model.t7 --data_path ../SUZ12/SUZ12_positive_test.fa --dataName SUZ12 --target_layer_names "[2]"
 ``` 
-#### you can choose sequence range which you want to show based on "show_seq" parameter. e.g.all,top-100,50-200
+#### (optional) you can choose sequence range which you want to show based on "show_seq" parameter. e.g.all,top-100,50-200
 ```python
  python3 visualize.py --show_seq top-200 --load model.t7 --data_path ../SUZ12/SUZ12_positive_test.fa --dataName SUZ12 --target_layer_names "[2]"
 ``` 
@@ -292,6 +302,7 @@ We also collect the sub-sequences whose scores surpass the threshold and save th
 
  
 ## Example2 - Enhancer Activity:
+users can run a sample dataset with the following: "./example/enhancer/run.sh".
 ### preprocesing
 Please refer to the ReadMe file in the preprocessing folder
 ### train
@@ -299,10 +310,13 @@ Please refer to the ReadMe file in the preprocessing folder
 python3 ezgeno.py --task epigenome --cuda 0 --train_dNase_path ../dNase/h1hesc_dnase.training.score --train_seq_path ../dNase/h1hesc_dnase.training_input_seq 
 --train_label_path ../dNase/h1hesc_dnase.training_label --test_dNase_path ../dNase/h1hesc_dnase.validation.score --test_seq_path ../dNase/h1hesc_dnase.validation_input_seq --test_label_path ../dNase/h1hesc_dnase.validation_label
 ``` 
-### load model and predict 
+### (optional) load model and predict 
 ``` python
  python3 ezgeno.py --task epigenome --cuda 0 
 ``` 
 
+### Performance Evaluation
+![AUC curve](https://github.com/p568912/ezgeno/blob/master/active_enhancer_AUC.png)
 
+![time cost](https://github.com/p568912/ezgeno/blob/master/active_enhancer_time.png)
 

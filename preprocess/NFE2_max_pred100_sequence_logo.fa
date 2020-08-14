@@ -1,0 +1,214 @@
+>seq_15_35_51_tensor([[49.9141]], device='cuda:0')
+GTGAGTGACTCAGCGCT
+>seq_19_42_58_tensor([[39.2560]], device='cuda:0')
+ACTGCTGTGTCACTGCA
+>seq_22_36_52_tensor([[47.6346]], device='cuda:0')
+TGTGCTGAGTCATTCAA
+>seq_22_58_69_tensor([[47.6346]], device='cuda:0')
+TGCTGACTCATC
+>seq_23_55_71_tensor([[40.0331]], device='cuda:0')
+ACTGCTGAGTCACTGGA
+>seq_28_36_52_tensor([[42.8928]], device='cuda:0')
+CTCGGTGACTAAGCAGT
+>seq_32_20_36_tensor([[39.9103]], device='cuda:0')
+CACCGTGACTCAGCACT
+>seq_32_64_77_tensor([[39.9103]], device='cuda:0')
+GTGCTTTGTCATGG
+>seq_33_31_46_tensor([[49.8699]], device='cuda:0')
+CACATGACTCAGCAGA
+>seq_34_47_61_tensor([[42.4364]], device='cuda:0')
+AGTGCTGAGTCATCG
+>seq_35_47_62_tensor([[41.5190]], device='cuda:0')
+GAGATGACTCAGCATA
+>seq_36_26_41_tensor([[40.3604]], device='cuda:0')
+ACAATGACTAAGCAAA
+>seq_42_46_61_tensor([[41.4531]], device='cuda:0')
+GGCGTGACTCAGCATT
+>seq_46_26_41_tensor([[44.5256]], device='cuda:0')
+ACTGTGACTCAGCATT
+>seq_49_53_67_tensor([[41.1492]], device='cuda:0')
+AGGTGACTCAGCAGT
+>seq_51_42_58_tensor([[40.9357]], device='cuda:0')
+CATGATGACTCAGCAGC
+>seq_59_31_47_tensor([[44.8386]], device='cuda:0')
+TGTGCTGAGTCATGCCC
+>seq_61_20_32_tensor([[45.9617]], device='cuda:0')
+GGATGACTCAGCA
+>seq_61_43_54_tensor([[45.9617]], device='cuda:0')
+GGATGACTCAGC
+>seq_65_49_65_tensor([[44.5237]], device='cuda:0')
+CTTGCTGAGTCATGCAG
+>seq_67_55_71_tensor([[38.2577]], device='cuda:0')
+ATTGCTGTGTCATCCTG
+>seq_71_53_68_tensor([[39.0893]], device='cuda:0')
+GTAGTGACTCAGCAGA
+>seq_75_37_52_tensor([[46.3080]], device='cuda:0')
+CTTATGACTCAGCAGT
+>seq_82_26_42_tensor([[49.8857]], device='cuda:0')
+AAAGATGAGTCAGCAAT
+>seq_85_42_60_tensor([[42.7304]], device='cuda:0')
+ATTCTGCTGAGTCATTGTT
+>seq_88_49_64_tensor([[45.4035]], device='cuda:0')
+GAAATGACTCAGCAAA
+>seq_93_55_73_tensor([[39.8303]], device='cuda:0')
+CCTTTGCTGAGTCATTGTG
+>seq_95_36_52_tensor([[38.7646]], device='cuda:0')
+CGGAATGACTCGGCGCT
+>seq_108_54_72_tensor([[41.7551]], device='cuda:0')
+TTTTTGCTGAGTCATTTCC
+>seq_111_45_61_tensor([[48.7358]], device='cuda:0')
+CCTGCTGAGTCATGCTG
+>seq_116_26_42_tensor([[41.7686]], device='cuda:0')
+GGCCGTGACTCAGCAGG
+>seq_117_48_66_tensor([[39.4260]], device='cuda:0')
+TATTTGCTGACTCATCTGT
+>seq_120_50_66_tensor([[57.0743]], device='cuda:0')
+CTGGGTGACTCAGCAGT
+>seq_124_36_52_tensor([[42.8777]], device='cuda:0')
+AACAGTGAGTCAGCAGA
+>seq_129_43_61_tensor([[42.5280]], device='cuda:0')
+AATTTGCTGAGTCATTGGA
+>seq_132_42_57_tensor([[47.8492]], device='cuda:0')
+AGTATGACTCAGCTAT
+>seq_133_21_36_tensor([[53.5694]], device='cuda:0')
+CCCATGACTCAGCAAT
+>seq_133_73_88_tensor([[53.5694]], device='cuda:0')
+TACATGACTCAGCAAT
+>seq_137_45_61_tensor([[38.5351]], device='cuda:0')
+GAATTGCTGAGTCATGC
+>seq_138_31_47_tensor([[40.4108]], device='cuda:0')
+TTAGGTGACTCAGCATT
+>seq_145_42_57_tensor([[43.9774]], device='cuda:0')
+GACATGACTAAGCAAC
+>seq_158_50_66_tensor([[43.5247]], device='cuda:0')
+CCCCATGACTCAGCGTT
+>seq_160_47_62_tensor([[48.6590]], device='cuda:0')
+TCTATGACTCAGCAAT
+>seq_164_52_67_tensor([[44.4471]], device='cuda:0')
+ACCATGAGTCAGCAGA
+>seq_166_29_45_tensor([[50.8812]], device='cuda:0')
+ATGAATGAGTCAGCACT
+>seq_175_39_55_tensor([[39.4195]], device='cuda:0')
+AATGCTGAGTCATGTCT
+>seq_176_34_49_tensor([[39.3715]], device='cuda:0')
+ATGGTGACTCAGCAGA
+>seq_176_63_76_tensor([[39.3715]], device='cuda:0')
+AGGGTGACTCAGCA
+>seq_182_36_52_tensor([[40.6661]], device='cuda:0')
+CACAATGACTAAGCACA
+>seq_183_54_70_tensor([[46.8260]], device='cuda:0')
+TGTGCTGAGTCATGCTG
+>seq_189_29_44_tensor([[48.3944]], device='cuda:0')
+AACATGACTCAGCAGA
+>seq_190_29_44_tensor([[55.2484]], device='cuda:0')
+TGGATGACTCAGCAAG
+>seq_196_64_78_tensor([[43.1380]], device='cuda:0')
+GAGTGACTCAGCAAG
+>seq_197_52_64_tensor([[40.0351]], device='cuda:0')
+AGATGACATTGCA
+>seq_198_42_58_tensor([[46.8667]], device='cuda:0')
+TGTGCTGAGTCATTCAT
+>seq_199_54_70_tensor([[45.0209]], device='cuda:0')
+ATTGCTGAGTCACTGAG
+>seq_207_31_47_tensor([[45.3246]], device='cuda:0')
+AAGGATGAGTCAGCAAT
+>seq_217_26_40_tensor([[40.9227]], device='cuda:0')
+GGGTGACTCAGCTGT
+>seq_218_28_44_tensor([[50.0938]], device='cuda:0')
+CCACATGACTCAGCAAT
+>seq_225_16_31_tensor([[38.9002]], device='cuda:0')
+AAAGTGACTCAGCATT
+>seq_225_76_89_tensor([[38.9002]], device='cuda:0')
+GTGCTGAGTCAGCT
+>seq_232_35_51_tensor([[41.9850]], device='cuda:0')
+ATTGATGACTCAGCATT
+>seq_235_30_44_tensor([[44.0761]], device='cuda:0')
+AATGCTGAGTCATCC
+>seq_240_48_63_tensor([[41.8737]], device='cuda:0')
+TGCATGACTCAGCAGT
+>seq_255_53_69_tensor([[38.8551]], device='cuda:0')
+CTTGCTGAGTCACGCAG
+>seq_263_25_41_tensor([[44.2341]], device='cuda:0')
+CTTGCTGAGTCATGCAG
+>seq_269_33_48_tensor([[45.1221]], device='cuda:0')
+AAGATGACTCAGCACT
+>seq_271_30_45_tensor([[44.8978]], device='cuda:0')
+GCTATGACTCAGCAAT
+>seq_276_35_51_tensor([[42.4808]], device='cuda:0')
+CCACATGACTCAGCAGT
+>seq_278_53_69_tensor([[43.3630]], device='cuda:0')
+GGTGCTGAGTCATCCTT
+>seq_286_26_42_tensor([[49.5643]], device='cuda:0')
+TGACGTGACTCAGCAGA
+>seq_287_46_62_tensor([[40.6714]], device='cuda:0')
+AATGCTGAGTCATGCTC
+>seq_289_29_45_tensor([[49.7821]], device='cuda:0')
+AGTGCTGAGTCACTGCG
+>seq_298_38_53_tensor([[48.1987]], device='cuda:0')
+ACCATGACTCAGCAGG
+>seq_308_35_51_tensor([[40.7158]], device='cuda:0')
+AACTATGACTCAGCATT
+>seq_312_28_40_tensor([[44.0257]], device='cuda:0')
+GGATGACTCAGCA
+>seq_323_44_59_tensor([[43.2653]], device='cuda:0')
+AGAATGACTCTGCAGT
+>seq_335_28_46_tensor([[39.5085]], device='cuda:0')
+AAATTGCTGAGTCACTTCA
+>seq_339_27_43_tensor([[43.7809]], device='cuda:0')
+AGTGCTGAGTCATGGCA
+>seq_346_67_85_tensor([[39.4687]], device='cuda:0')
+CATTTGCTGAGTCACCCTA
+>seq_350_48_66_tensor([[41.4459]], device='cuda:0')
+TATTTGCTGAGTCACTCAA
+>seq_353_46_64_tensor([[39.1318]], device='cuda:0')
+AATTTGCTGAGTCATGGGG
+>seq_353_83_94_tensor([[39.1318]], device='cuda:0')
+CCATGACTCAGC
+>seq_362_44_59_tensor([[39.7973]], device='cuda:0')
+ACTGTGAGTCAGCAAG
+>seq_364_34_46_tensor([[50.6074]], device='cuda:0')
+AAATGACTCAGCA
+>seq_365_35_49_tensor([[42.0009]], device='cuda:0')
+ATATGACTCAGCAAT
+>seq_372_39_55_tensor([[63.5120]], device='cuda:0')
+CCACATGACTCAGCAAT
+>seq_375_39_54_tensor([[41.5598]], device='cuda:0')
+TGGATGAGACAGCAAT
+>seq_380_51_65_tensor([[57.2288]], device='cuda:0')
+GGATGACTCAGCAAT
+>seq_382_33_49_tensor([[53.5111]], device='cuda:0')
+AGTGCTTAGTCATCCTT
+>seq_389_53_71_tensor([[40.8013]], device='cuda:0')
+AAAATGCTGAGTCACTTTG
+>seq_392_32_48_tensor([[38.9434]], device='cuda:0')
+TTTGCTGACTCATTTCC
+>seq_405_31_45_tensor([[42.8588]], device='cuda:0')
+AGATGACTCAGCAGT
+>seq_408_26_40_tensor([[44.6261]], device='cuda:0')
+GAATGAGTCAGCAAA
+>seq_414_39_55_tensor([[55.3451]], device='cuda:0')
+GTGAATGACTCAGCATT
+>seq_423_28_43_tensor([[49.2591]], device='cuda:0')
+GCTGTGACTCAGCACA
+>seq_433_37_52_tensor([[61.4499]], device='cuda:0')
+AGGATGACTCAGCAGT
+>seq_434_26_40_tensor([[49.5887]], device='cuda:0')
+AAATGACACAGCATT
+>seq_438_23_39_tensor([[43.3452]], device='cuda:0')
+AGTGCTGAGTCACCGCG
+>seq_442_31_47_tensor([[56.3108]], device='cuda:0')
+ACATATGACTCAGCAAT
+>seq_445_30_46_tensor([[44.1716]], device='cuda:0')
+TGTGCTGAGTCATTTTG
+>seq_449_31_49_tensor([[40.2949]], device='cuda:0')
+AAATTGCTGAGTCATGGAT
+>seq_456_20_36_tensor([[42.1651]], device='cuda:0')
+GCTGGTGACTCAGCACT
+>seq_457_49_65_tensor([[41.9104]], device='cuda:0')
+AGTGCTGAGTCACACAT
+>seq_468_44_60_tensor([[53.9762]], device='cuda:0')
+AACGCTGAGTCATCCCT
+>seq_485_41_55_tensor([[45.5157]], device='cuda:0')
+ATATGACTCAGCAAT
+>seq_499_35_49_tensor([[39.1232]], device='cuda:0')
+CTATGACTCAGCAGT

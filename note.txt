@@ -1,0 +1,57 @@
+
+# NAS-related
+main.py       -- integrating training/test/
+utils.py      -- data preprocessing
+trainer.py    -- integrating NAS functions: maintaining the supernet, the controller and the search process
+network.py    -- the supernet class
+dataset.py    -- ezgeno training set testing set preparing
+controller.py -- the controller class
+
+main.py <---- utils.py
+          |-- trainer.py <----- network.py
+                            |-- controller.py
+
+# Gradcam-related
+visualize.py  -- show gradcam
+
+visulaize.py <--- X
+
+
+
+## utils.py
+* function get_variable: unknown
+* function keydefaultdict: unknown
+* function get_mean_and_std: unknown
+* function init_params: unknown
+* function onehot_encode_sequences: pass
+* function choose_optimizer: move into trainer
+
+## dataset.py
+* class trainset: aggregate tf/epi
+* class testset: aggregate tf/eps
+* function prepare_all_data: aggregate tf/epi
+
+## network.py
+* class ezGenoModel: aggregate tf/epi, self-defined filter_size
+
+## controller.py
+* class contorller: aggregate tf/epi
+
+## trainer.py
+* class ezGenoTrainer
+** function train_supernet
+** function train_controller
+** function train_subnet
+** function test
+** function train
+** function load_model
+** function save_model
+
+
+## visualize.py
+* class FeatureExtractor
+* class ModelOutputs
+* class GradCam
+* class gradCamTestset
+* function show_grad_cam
+
