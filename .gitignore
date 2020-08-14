@@ -1,0 +1,5 @@
+__pycache__/*
+__pycache__/
+./model.t7
+*.pyc
+.DS_Store
