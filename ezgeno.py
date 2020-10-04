@@ -41,7 +41,7 @@ def main():
     parser.add_argument('--layers', type=int, default=3)
     parser.add_argument('--feature_dim', type=int, default=128)
     parser.add_argument('--conv_filter_size_list', type=list, default=[3,7,11,15,19])
-    parser.add_argument('--task', type=str, default='TFBind', choices=['TFBind', 'epigenome'])
+    parser.add_argument('--task', type=str, default='TFBind', choices=['TFBind', 'AcEnhancer'])
     parser.add_argument('--dNase_layers', type=int, default=6)
     parser.add_argument('--dNase_feature_dim', type=int, default=64)
     parser.add_argument('--dNase_conv_filter_size_list', type=list, default=[3,7,11])
