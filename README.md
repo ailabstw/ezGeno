@@ -307,12 +307,12 @@ users can run a sample dataset with the following: "./example/enhancer/run.sh".
 Please refer to the ReadMe file in the preprocessing folder
 ### train
 ``` python
-python3 ezgeno.py --task epigenome --cuda 0 --train_dNase_path ../dNase/h1hesc_dnase.training.score --train_seq_path ../dNase/h1hesc_dnase.training_input_seq 
+python3 ezgeno.py --task AcEnhancer --cuda 0 --train_dNase_path ../dNase/h1hesc_dnase.training.score --train_seq_path ../dNase/h1hesc_dnase.training_input_seq 
 --train_label_path ../dNase/h1hesc_dnase.training_label --test_dNase_path ../dNase/h1hesc_dnase.validation.score --test_seq_path ../dNase/h1hesc_dnase.validation_input_seq --test_label_path ../dNase/h1hesc_dnase.validation_label
 ``` 
 ### (optional) load model and predict 
 ``` python
- python3 ezgeno.py --task epigenome --cuda 0 
+ python3 ezgeno.py --task AcEnhancer --cuda 0 
 ``` 
 
 ### Performance Evaluation
