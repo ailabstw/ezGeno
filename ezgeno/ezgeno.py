@@ -31,12 +31,12 @@ def main():
     parser.add_argument('--test_pos_data_path', type=str, default="../SUZ12/SUZ12_positive_test.fa", help='testing positive data path')
     parser.add_argument('--test_neg_data_path', type=str, default="../SUZ12/SUZ12_negative_test.fa", help='testing negative data path')
 
-    parser.add_argument('--train_dNase_path', type=str, default="../dNase/h1hesc_dnase.training.score", help='training score data path')
-    parser.add_argument('--train_seq_path', type=str, default="../dNase/h1hesc_dnase.training_input_seq", help='training seq data path')
-    parser.add_argument('--train_label_path', type=str, default="../dNase/h1hesc_dnase.training_label", help='training seq label path')
-    parser.add_argument('--test_dNase_path', type=str, default="../dNase/h1hesc_dnase.validation.score", help='testing positive data path')
-    parser.add_argument('--test_seq_path', type=str, default="../dNase/h1hesc_dnase.validation_input_seq", help='testing negative data path')
-    parser.add_argument('--test_label_path', type=str, default="../dNase/h1hesc_dnase.validation_label", help='testing negative data path')
+    parser.add_argument('--train_dNase_path', type=str, default="../../dNase/h1hesc_dnase.training.score", help='training score data path')
+    parser.add_argument('--train_seq_path', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training seq data path')
+    parser.add_argument('--train_label_path', type=str, default="../../dNase/h1hesc_dnase.training_label", help='training seq label path')
+    parser.add_argument('--test_dNase_path', type=str, default="../../dNase/h1hesc_dnase.validation.score", help='testing positive data path')
+    parser.add_argument('--test_seq_path', type=str, default="../../dNase/h1hesc_dnase.validation_input_seq", help='testing negative data path')
+    parser.add_argument('--test_label_path', type=str, default="../../dNase/h1hesc_dnase.validation_label", help='testing negative data path')
 
     parser.add_argument('--layers', type=int, default=3)
     parser.add_argument('--feature_dim', type=int, default=128)

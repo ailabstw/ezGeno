@@ -3,3 +3,5 @@ __pycache__/
 ./model.t7
 *.pyc
 .DS_Store
+./ezgeno/__pycache__/
+./ezgeno/__pycache__/*
