@@ -68,7 +68,7 @@ class ezGenoModel(nn.Module):
 
 
 
-class epigenomeModel(ezGenoModel):
+class AcEnhancerModel(ezGenoModel):
     def __init__(self, arch=None, layers=6, feature_dim=64,conv_filter_size_list=[3, 7, 11, 15, 19],dNase_layers=6,dNase_feature_dim=64,dNase_conv_filter_size_list=[3, 7, 11]):
 
         self.feature_dim=feature_dim
@@ -79,7 +79,7 @@ class epigenomeModel(ezGenoModel):
         else:
             self.seq_arch=None
             self.dNase_arch=None
-        super(epigenomeModel, self).__init__(self.seq_arch,self.layers,self.feature_dim,conv_filter_size_list)
+        super(AcEnhancerModel, self).__init__(self.seq_arch,self.layers,self.feature_dim,conv_filter_size_list)
         
 
         self.dNase_conv_filter_size_list=dNase_conv_filter_size_list

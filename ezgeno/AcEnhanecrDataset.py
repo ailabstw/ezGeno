@@ -82,7 +82,7 @@ class testset(Dataset):
 
 
 
-def prepare_all_epigenome_data( training_input_seq,training_input_dNase,trainging_input_label,validation_input_seq,validation_input_dNase,validation_label, batch_size, train_supernet=True):
+def prepare_all_AcEnhancer_data( training_input_seq,training_input_dNase,trainging_input_label,validation_input_seq,validation_input_dNase,validation_label, batch_size, train_supernet=True):
     train_data = trainset(training_input_seq,training_input_dNase,trainging_input_label)
     test_data = testset(validation_input_seq,validation_input_dNase,validation_label)
 

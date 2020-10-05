@@ -3,10 +3,10 @@ import argparse
 import warnings
 
 from utils import *
-from trainer import ezGenoTrainer,epigenomeTrainer
-from network import ezGenoModel,epigenomeModel
+from trainer import ezGenoTrainer,AcEnhancerTrainer
+from network import ezGenoModel,AcEnhancerModel
 from dataset import *
-from epigenomeDataset import *
+from AcEnhancerDataset import *
 
 warnings.simplefilter('once', UserWarning)
 
@@ -41,7 +41,7 @@ def main():
     parser.add_argument('--layers', type=int, default=3)
     parser.add_argument('--feature_dim', type=int, default=128)
     parser.add_argument('--conv_filter_size_list', type=list, default=[3,7,11,15,19])
-    parser.add_argument('--task', type=str, default='TFBind', choices=['TFBind', 'epigenome'])
+    parser.add_argument('--task', type=str, default='TFBind', choices=['TFBind', 'AcEnhancer'])
     parser.add_argument('--dNase_layers', type=int, default=6)
     parser.add_argument('--dNase_feature_dim', type=int, default=64)
     parser.add_argument('--dNase_conv_filter_size_list', type=list, default=[3,7,11])
@@ -59,9 +59,9 @@ def main():
     if args.task == 'TFBind':
         train_loader, valid_loader, test_loader = prepare_all_data(args.train_pos_data_path,args.train_neg_data_path,args.test_pos_data_path,args.test_neg_data_path, args.batch_size, train_supernet=True)
         trainer = ezGenoTrainer(args)
-    elif args.task == 'epigenome':
-        train_loader, valid_loader, test_loader = prepare_all_epigenome_data(args.train_seq_path,args.train_dNase_path,args.train_label_path,args.test_seq_path,args.test_dNase_path,args.test_label_path, args.batch_size, train_supernet=True)        
-        trainer = epigenomeTrainer(args)
+    elif args.task == 'AcEnhancer':
+        train_loader, valid_loader, test_loader = prepare_all_AcEnhancer_data(args.train_seq_path,args.train_dNase_path,args.train_label_path,args.test_seq_path,args.test_dNase_path,args.test_label_path, args.batch_size, train_supernet=True)        
+        trainer = AcEnhancerTrainer(args)
     if args.eval:
         trainer.test(trainer.subnet,test_loader)
     else:

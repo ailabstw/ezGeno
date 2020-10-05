@@ -18,7 +18,7 @@ from torchvision import transforms
 
 from utils import *
 from controller import Controller
-from network import ezGenoModel,epigenomeModel
+from network import ezGenoModel,AcEnhancerModel
 
 class ezGenoTrainer():
     def __init__(self, args,layers=6):
@@ -254,7 +254,7 @@ class ezGenoTrainer():
                 print("self.task",self.task)
                 self.subnet = ezGenoModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim)
             else:
-                self.subnet = epigenomeModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim,)
+                self.subnet = AcEnhancerModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim,)
             self.subnet_optimizer = choose_optimizer(self.optimizer,self.subnet,self.learning_rate,[self.weight_decay,self.momentum])
 
         ''' stage 3: train from scratch '''
@@ -305,9 +305,9 @@ class ezGenoTrainer():
 
 
 
-class epigenomeTrainer(ezGenoTrainer):
+class AcEnhancerTrainer(ezGenoTrainer):
     def __init__(self, args):
-        super(epigenomeTrainer, self).__init__(args)
+        super(AcEnhancerTrainer, self).__init__(args)
 
         self.supernet_epochs = args.supernet_epochs
         self.cstep = args.cstep
@@ -333,7 +333,7 @@ class epigenomeTrainer(ezGenoTrainer):
             self.dNase_feature_dim = self.info["dNase_feature_dim"]
             self.dNase_conv_filter_size_list= self.info["dNase_conv_filter_size_list"]
 
-            self.supernet = epigenomeModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
+            self.supernet = AcEnhancerModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
             self.controller = Controller(args, self.supernet.num_conv_choice, self.layers,self.supernet.dNase_num_conv_choice,self.dNase_layers)
 
 
@@ -347,7 +347,7 @@ class epigenomeTrainer(ezGenoTrainer):
             except:
                 print("fail to load controller. please check whether the setting is the same as the checkpoint.")
             if self.best_arch is not None:
-                self.subnet = epigenomeModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim, dNase_layers=self.dNase_layers, dNase_feature_dim=self.dNase_feature_dim)
+                self.subnet = AcEnhancerModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim, dNase_layers=self.dNase_layers, dNase_feature_dim=self.dNase_feature_dim)
             if checkpoint["subnet_state_dict"] is not None:
                 try:
                     self.subnet.load_state_dict(checkpoint["subnet_state_dict"])
@@ -361,7 +361,7 @@ class epigenomeTrainer(ezGenoTrainer):
             self.dNase_feature_dim = args.dNase_feature_dim
             self.dNase_conv_filter_size_list= args.dNase_conv_filter_size_list
 
-            self.supernet = epigenomeModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
+            self.supernet = AcEnhancerModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
             self.controller = Controller(args, self.supernet.num_conv_choice, self.layers,self.supernet.dNase_num_conv_choice,self.dNase_layers)
 
         self.criterion = nn.BCELoss()

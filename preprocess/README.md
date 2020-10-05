@@ -30,6 +30,6 @@ Required arguments:
  python3 createdata.py --filename JUND_HepG2_JunD_HudsonAlpha_AC.seq
  ```
  
-# 2. Epigenome preprocessing:
+# 2. AcEnhancer preprocessing:
  Example dataset:
  you can download sample set from [here](https://drive.google.com/file/d/1qLk48r1tbmfhXsEiQhhz9kpYwuoVvJEQ/view?usp=sharing )

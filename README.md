@@ -14,7 +14,7 @@ This repository contains a pytorch implementation of an eNAS algorithm, where pa
 *  **utils.py**            : file for helper functions.
 *  **controller.py**       : Controller(Agent) will use reinforcemnt learning to learn which architecture is better from the available search space.
 *  **dataset.py**          : define ezgeno input file data formats.
-*  **epigenomeDataset**    : define epigenome input file data formats.
+*  **AcEnhancerDataset**    : define AcEnhancer input file data formats.
 *  **trainer**             : define training steps.
 *  **visualize.py**        : visualize sequence position importance and output sub-sequence data whose score surpasses threshold.
 
@@ -97,7 +97,7 @@ Required arguments:
   --test_neg_data_path
                         negative testing data path. 
                         [Type: String]
- 2.epigenome
+ 2.AcEnhancer
   --train_dNase_path    
                         training data dNase path. A file with a 25*1 vector per row. The elements in the vector are of type int, which represent DNA expression. 
                         [Type: String]  
@@ -125,8 +125,8 @@ Optional arguments:
                         Show this help message and exit
   --task 
                         "TFBind": predicting TF binding
-                        "epigenome": predicting activity of enhancers
-                        [Type: String, default: "TFBind", options: "TFBind, epigenome"]
+                        "AcEnhancer": predicting activity of enhancers
+                        [Type: String, default: "TFBind", options: "TFBind, AcEnhancer"]
                         
   --negative_data_method NEGATIVE_DATA_METHOD  
                         If not given the negative training data, ezGeno will generate 
@@ -177,26 +177,26 @@ Optional arguments:
                         
   --layers 
                         1. In TFBind task, we use this parameter to determine the layers of convolution units.
-                        2. In epigenome task, we use this parameter to determine the layers of convolution units in sequence module.
+                        2. In AcEnhancer task, we use this parameter to determine the layers of convolution units in sequence module.
                         [Type: int, default: 3]
   --feature_dim
                         1. In TFBind task, we use this parameter to determine the number of convolution filters.
-                        2. In epigenome task, we use this parameter to determine the number of convolution filters in sequence module.
+                        2. In AcEnhancer task, we use this parameter to determine the number of convolution filters in sequence module.
                         [Type: int, default: 64]
   --conv_filter_size_list
                         1. In TFBind task, we use this parameter to determine the filter size list of convolution filters. Our purposed method will 
                         find the best filter size from this list by reinforcement learning.
-                        2. In epigenome task, we use this parameter to determine the filter size list of convolution filters in sequence module.
+                        2. In AcEnhancer task, we use this parameter to determine the filter size list of convolution filters in sequence module.
                         Our purposed method will find the best filter size from this list by reinforcement learning.
                         [Type: List, default: [3,7,11,15,19] ]
   --dNase_layers
-                        The parameter is only work on epigenome task. We use this parameter to determine the layers of convolution units in dNase modules.
+                        The parameter is only work on AcEnhancer task. We use this parameter to determine the layers of convolution units in dNase modules.
                         [Type: int, default: 6]
   --dNase_feature_dim
-                        The parameter is only work on epigenome task. We use this parameter to determine the number of convolution filters in dNase module.
+                        The parameter is only work on AcEnhancer task. We use this parameter to determine the number of convolution filters in dNase module.
                         [Type: int, default: 64]
   --dNase_conv_filter_size_list
-                        The parameter is only works on epigenome tasks. We use this parameter to determine the filter size list of convolution filters in dNase
+                        The parameter is only works on AcEnhancer tasks. We use this parameter to determine the filter size list of convolution filters in dNase
                         module.      
                         [Type: List, default: [3,7,11] ]
                                       
@@ -242,7 +242,7 @@ pip3 install -r requirements.txt
 ### Dataset
 1)TFBind: We downloaded data transcription factors ChIP-seq called peaks from the curated database of deepBind. Alipanahi et al. (2015) from the ENCODE database.
 
-2)Epigenome:The portal now makes available over 13000 datasets and their accompanying metadata and can be accessed at: https://www.encodeproject.org/ .
+2)AcEnhancer:The portal now makes available over 13000 datasets and their accompanying metadata and can be accessed at: https://www.encodeproject.org/ .
 
 ### Models
 **./models** contains links of previous trained models.
@@ -307,12 +307,12 @@ users can run a sample dataset with the following: "./example/enhancer/run.sh".
 Please refer to the ReadMe file in the preprocessing folder
 ### train
 ``` python
-python3 ezgeno.py --task epigenome --cuda 0 --train_dNase_path ../dNase/h1hesc_dnase.training.score --train_seq_path ../dNase/h1hesc_dnase.training_input_seq 
+python3 ezgeno.py --task AcEnhancer --cuda 0 --train_dNase_path ../dNase/h1hesc_dnase.training.score --train_seq_path ../dNase/h1hesc_dnase.training_input_seq 
 --train_label_path ../dNase/h1hesc_dnase.training_label --test_dNase_path ../dNase/h1hesc_dnase.validation.score --test_seq_path ../dNase/h1hesc_dnase.validation_input_seq --test_label_path ../dNase/h1hesc_dnase.validation_label
 ``` 
 ### (optional) load model and predict 
 ``` python
- python3 ezgeno.py --task epigenome --cuda 0 
+ python3 ezgeno.py --task AcEnhancer --cuda 0 
 ``` 
 
 ### Performance Evaluation
