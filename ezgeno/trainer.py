@@ -38,7 +38,8 @@ class ezGenoTrainer():
         self.momentum=args.momentum
         self.optimizer=args.optimizer
         self.controller_optimizer=args.controller_optimizer
-        
+
+	#load model        
         if os.path.isfile(args.load):
             checkpoint = torch.load(args.load)
 
