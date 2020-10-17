@@ -70,6 +70,7 @@ def onehot_encode_sequences(sequences):
             else:
                 arr[i, mapping[letter]] = 1.0
         onehot.append(arr)
+        #onehot.append(arr.T)
     return onehot
 
 def choose_optimizer(optimizerName,model,learning_rate,parameters_list):

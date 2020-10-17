@@ -88,7 +88,7 @@ class AcEnhancerModel(ezGenoModel):
         self.dNase_channels = [1] + [self.dNase_feature_dim for i in range(self.dNase_layers)]
         self.dNase_features = torch.nn.ModuleList()
         self.dNase_bn = nn.BatchNorm1d(1)
-        print("self.dNase_conv_filter_size_list",dNase_conv_filter_size_list)
+        #print("self.dNase_conv_filter_size_list",dNase_conv_filter_size_list)
         self.dNase_num_conv_choice=len(self.dNase_conv_filter_size_list)*2
 
         for i in range(self.dNase_layers):
@@ -119,6 +119,7 @@ class AcEnhancerModel(ezGenoModel):
         )
 
     def forward(self, x1,x2, arch=None):
+        
         x1 = self.bn(x1)
         x1 = x1.squeeze()
         feature_maps = []

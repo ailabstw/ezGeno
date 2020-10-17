@@ -36,7 +36,7 @@ class trainset(Dataset):
         data, labels = zip(*shuffle_data)
 
         self.encoded_training = np.transpose(np.array(onehot_encode_sequences(np.array(data)), dtype='float32'), (0, 2, 1))
-
+        #self.encoded_training = np.stack(onehot_encode_sequences(data))
         self.train_labels = np.array(labels)
 
         self.transform = transform
@@ -77,10 +77,11 @@ class testset(Dataset):
         test_data = test_pos_list + test_negative_list
         test_labels = np.zeros(len(test_data), dtype = int)
         test_labels[0 : len(test_pos_list) -1 ] = 1
-        test_shuffle_data = list(zip(test_data, test_labels))
-        test_data, test_labels = zip(*test_shuffle_data)
+        #test_shuffle_data = list(zip(test_data, test_labels))
+        #test_data, test_labels = zip(*test_shuffle_data)
 
         self.encoded_test = np.transpose(np.array(onehot_encode_sequences(np.array(test_data)), dtype='float32'), (0, 2, 1))
+        #self.encoded_test = np.stack(onehot_encode_sequences(test_data))
         self.test_labels = np.array(test_labels)
 
     def __getitem__(self, index):
@@ -92,7 +93,7 @@ class testset(Dataset):
     def __len__(self):
         return len(self.encoded_test)
 
-def prepare_all_data(train_pos_data_path,train_neg_data_path,test_pos_data_path,test_neg_data_path, batch_size, train_supernet=True):
+def prepare_all_data(train_pos_data_path,train_neg_data_path,test_pos_data_path,test_neg_data_path, batch_size,num_workers, train_supernet=True):
     train_data = trainset(train_pos_data_path,train_neg_data_path)
     test_data = testset(test_pos_data_path,test_neg_data_path)
 
@@ -101,19 +102,19 @@ def prepare_all_data(train_pos_data_path,train_neg_data_path,test_pos_data_path,
         dataset_size = len(train_data)
         indices = list(range(dataset_size))
         split = int(np.floor(0.2 * dataset_size))
-        np.random.shuffle(indices)
+        #np.random.shuffle(indices)
         train_indices, val_indices = indices[split:], indices[:split]
         train_sampler = SubsetRandomSampler(train_indices)
         valid_sampler = SubsetRandomSampler(val_indices)
 
-        train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=train_sampler, pin_memory=True, num_workers=2)
-        valid_loader = torch.utils.data.DataLoader(train_data, batch_size=100, sampler=valid_sampler, pin_memory=True, num_workers=2)
-        test_loader = torch.utils.data.DataLoader(test_data, batch_size=500, num_workers=2)
+        train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=train_sampler, pin_memory=True, num_workers=num_workers)
+        valid_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=valid_sampler, pin_memory=True, num_workers=num_workers)
+        test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
 
         return train_loader, valid_loader, test_loader
     
     else:
         train_data = trainset(data_path, transform=transforms.Compose([RandomShift(30)]))
-        train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, pin_memory=True, num_workers=2)
-        test_loader = torch.utils.data.DataLoader(test_data, batch_size=500, num_workers=2)
+        train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, pin_memory=True, num_workers=num_workers)
+        test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
         return train_loader, test_loader

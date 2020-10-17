@@ -29,7 +29,6 @@ class ezGenoTrainer():
         self.epochs = args.epochs
         self.learning_rate = args.learning_rate
         self.save = args.save
-
         self.best_arch = None
         self.subnet = None
         self.task=args.task
@@ -39,35 +38,10 @@ class ezGenoTrainer():
         self.optimizer=args.optimizer
         self.controller_optimizer=args.controller_optimizer
         
-        if os.path.isfile(args.load):
-            checkpoint = torch.load(args.load)
-
-            self.best_arch   = checkpoint["best_arch"]
-            self.info= checkpoint["info"]
-            self.feature_dim = self.info["feature_dim"]
-            self.conv_filter_size_list= self.info["conv_filter_size_list"]
-            self.layers= self.info["layers"]
-
-            self.supernet = ezGenoModel(layers=self.layers, feature_dim=self.feature_dim)
-            self.controller = Controller(args, self.supernet.num_conv_choice,self.layers)
-
-            try:
-                self.supernet.load_state_dict(checkpoint["supernet_state_dict"])
-            except:
-                print("fail to load supernet. please check whether the setting is the same as the checkpoint.")
-
-            try:
-                self.controller.load_state_dict(checkpoint["controller_state_dict"])
-            except:
-                print("fail to load controller. please check whether the setting is the same as the checkpoint.")
-
-            if self.best_arch is not None:
-                self.subnet = ezGenoModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim)
-            if checkpoint["subnet_state_dict"] is not None:
-                try:
-                    self.subnet.load_state_dict(checkpoint["subnet_state_dict"])
-                except:
-                    print("fail to load subnet. please check whether the setting is the same as the checkpoint.")
+        if os.path.isfile(args.load and args.task="TFBind"):
+            print("loading model {}".format(args.load))
+            self.load_model(args)
+            
         else:
             print("no checkpoint found.")
             self.layers = args.layers
@@ -290,69 +264,60 @@ class ezGenoTrainer():
 
         self.save_model(self.info)
 
-    def load_model(self, path):
-        checkpoint = torch.load(path)
-        return checkpoint
+    def load_model(self, args):
+        checkpoint = torch.load(args.load)
+        self.best_arch= checkpoint["best_arch"]
+        self.info= checkpoint["info"]
+        self.feature_dim = self.info["feature_dim"]
+        self.conv_filter_size_list= self.info["conv_filter_size_list"]
+        self.layers= self.info["layers"]
+
+        self.supernet = ezGenoModel(layers=self.layers, feature_dim=self.feature_dim)
+        self.controller = Controller(args, self.supernet.num_conv_choice,self.layers)
+
+        self.load_supernet(checkpoint)
+        self.load_controller(checkpoint)
+        
+        if self.best_arch is not None:
+            self.subnet = ezGenoModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim)
+        self.load_subnet(checkpoint)
 
     def save_model(self,info):
         torch.save({
-            'supernet_state_dict': self.supernet.state_dict(), 
-            'controller_state_dict': self.controller.state_dict(), 
             'best_arch': self.best_arch, 
-            'subnet_state_dict': self.subnet.state_dict() if self.subnet is not None else None,
-            'info':info
+            'info':info,
+            'supernet_state_dict': self.supernet.state_dict(), 
+            'controller_state_dict': self.controller.state_dict(),
+            'subnet_state_dict': self.subnet.state_dict() if self.subnet is not None else None
             }, self.save)
 
+    def load_supernet(self,checkpoint):
+        try:
+            self.supernet.load_state_dict(checkpoint["supernet_state_dict"])
+        except:
+            print("fail to load supernet. please check whether the setting is the same as the checkpoint.")
+
+    def load_controller(self,checkpoint):
+        try:
+            self.controller.load_state_dict(checkpoint["controller_state_dict"])
+        except:
+            print("fail to load controller. please check whether the setting is the same as the checkpoint.")
+   
+    def load_subnet(self,checkpoint):
+        if checkpoint["subnet_state_dict"] is not None:
+            try:
+                self.subnet.load_state_dict(checkpoint["subnet_state_dict"])
+            except:
+                print("fail to load subnet. please check whether the setting is the same as the checkpoint.")
 
 
 class AcEnhancerTrainer(ezGenoTrainer):
     def __init__(self, args):
         super(AcEnhancerTrainer, self).__init__(args)
-
-        self.supernet_epochs = args.supernet_epochs
-        self.cstep = args.cstep
-        self.epochs = args.epochs
-        self.learning_rate = args.learning_rate
-        self.save = args.save 
-        self.subnet = None
-        self.best_arch = None
-
-        self.weight_decay=args.weight_decay
-        self.momentum=args.momentum
-        self.optimizer=args.optimizer
-        self.controller_optimizer=args.controller_optimizer
         
         if os.path.isfile(args.load):
-            checkpoint = torch.load(args.load)
-            self.info= checkpoint["info"]
-            self.layers= self.info["layers"]
-            self.best_arch   = checkpoint["best_arch"]
-            self.feature_dim = self.info["feature_dim"]
-            self.conv_filter_size_list= self.info["conv_filter_size_list"]
-            self.dNase_layers= self.info["dNase_layers"]
-            self.dNase_feature_dim = self.info["dNase_feature_dim"]
-            self.dNase_conv_filter_size_list= self.info["dNase_conv_filter_size_list"]
-
-            self.supernet = AcEnhancerModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
-            self.controller = Controller(args, self.supernet.num_conv_choice, self.layers,self.supernet.dNase_num_conv_choice,self.dNase_layers)
-
-
-            try:
-                self.supernet.load_state_dict(checkpoint["supernet_state_dict"])
-            except:
-                print("fail to load supernet. please check whether the setting is the same as the checkpoint.")
-
-            try:
-                self.controller.load_state_dict(checkpoint["controller_state_dict"])
-            except:
-                print("fail to load controller. please check whether the setting is the same as the checkpoint.")
-            if self.best_arch is not None:
-                self.subnet = AcEnhancerModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim, dNase_layers=self.dNase_layers, dNase_feature_dim=self.dNase_feature_dim)
-            if checkpoint["subnet_state_dict"] is not None:
-                try:
-                    self.subnet.load_state_dict(checkpoint["subnet_state_dict"])
-                except:
-                    print("fail to load subnet. please check whether the setting is the same as the checkpoint.")
+            print("loading model {}".format(args.load))
+            self.load_model(args)
         else:
             self.layers= args.layers
             self.feature_dim = args.feature_dim
@@ -364,29 +329,16 @@ class AcEnhancerTrainer(ezGenoTrainer):
             self.supernet = AcEnhancerModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
             self.controller = Controller(args, self.supernet.num_conv_choice, self.layers,self.supernet.dNase_num_conv_choice,self.dNase_layers)
 
-        self.criterion = nn.BCELoss()
-        self.supernet_optimizer = choose_optimizer(self.optimizer,self.supernet,args.supernet_learning_rate,[self.weight_decay,self.momentum])
-        self.num_choices = []
-        for i in range(self.layers):
-            self.num_choices.append(self.supernet.num_conv_choice)
-            self.num_choices.append(i+1)
         for i in range(self.dNase_layers):
             self.num_choices.append(self.supernet.dNase_num_conv_choice)
             self.num_choices.append(i+1)
         self.get_random_cand = lambda:tuple(np.random.randint(i) for i in self.num_choices)
-        self.controller_optimizer = choose_optimizer(self.controller_optimizer,self.controller,args.controller_learning_rate,[self.weight_decay,self.momentum])
         if self.subnet is not None:
             self.subnet_optimizer =  choose_optimizer(self.optimizer,self.subnet,self.learning_rate,[self.weight_decay,self.momentum])
         else:
             self.subnet_optimizer = None
 
-        if args.cuda==-1:
-            self.device = 'cpu'
-        else:
-            self.device = 'cuda:%d'%args.cuda
-
         self.info={'layers':self.layers,'feature_dim':self.feature_dim,'conv_filter_size_list':self.conv_filter_size_list,'dNase_layers':self.dNase_layers,'dNase_feature_dim':self.dNase_feature_dim,'dNase_conv_filter_size_list':self.dNase_conv_filter_size_list}
-
 
     
     def train_supernet(self,model, train_loader, optimizer, criterion, epoch, get_random_cand=None, arch=None):
@@ -527,12 +479,25 @@ class AcEnhancerTrainer(ezGenoTrainer):
         print("Test AUC score: {:.4f}\n".format(roc_auc_score(np.array(all_label), np.array(all_pred))))
         return roc_auc_score(np.array(all_label), np.array(all_pred))
 
-    def save_model(self,info):
-        torch.save({
-            'supernet_state_dict': self.supernet.state_dict(), 
-            'controller_state_dict': self.controller.state_dict(), 
-            'best_arch': self.best_arch, 
-            'subnet_state_dict': self.subnet.state_dict() if self.subnet is not None else None,
-            'info':info
-            }, self.save)
 
+    def load_model(self, args):
+        checkpoint = torch.load(args.load)
+        self.best_arch = checkpoint["best_arch"]
+        self.info= checkpoint["info"]
+        self.layers= self.info["layers"]
+        self.feature_dim = self.info["feature_dim"]
+        self.conv_filter_size_list= self.info["conv_filter_size_list"]
+        self.dNase_layers= self.info["dNase_layers"]
+        self.dNase_feature_dim = self.info["dNase_feature_dim"]
+        self.dNase_conv_filter_size_list= self.info["dNase_conv_filter_size_list"]
+
+        self.supernet = AcEnhancerModel(layers=self.layers, feature_dim=self.feature_dim,conv_filter_size_list=self.conv_filter_size_list,dNase_layers=self.dNase_layers,dNase_feature_dim=self.dNase_feature_dim,dNase_conv_filter_size_list=self.dNase_conv_filter_size_list)
+        self.controller = Controller(args, self.supernet.num_conv_choice, self.layers,self.supernet.dNase_num_conv_choice,self.dNase_layers)
+
+        self.load_supernet(checkpoint)
+        self.load_controller(checkpoint)
+
+        if self.best_arch is not None:
+            self.subnet = AcEnhancerModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim, dNase_layers=self.dNase_layers, dNase_feature_dim=self.dNase_feature_dim)
+        
+        self.load_subnet(checkpoint)

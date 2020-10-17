@@ -26,10 +26,10 @@ def main():
     parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight decay')
 
-    parser.add_argument('--train_pos_data_path', type=str, default="../SUZ12/SUZ12_positive_augmentation_includeOrig_training.fa", help='training positive data path')
-    parser.add_argument('--train_neg_data_path', type=str, default="../SUZ12/SUZ12_negative_dinuclShuffle_augmentation_includeOrig_training.fa", help='training negative data path')
-    parser.add_argument('--test_pos_data_path', type=str, default="../SUZ12/SUZ12_positive_test.fa", help='testing positive data path')
-    parser.add_argument('--test_neg_data_path', type=str, default="../SUZ12/SUZ12_negative_test.fa", help='testing negative data path')
+    parser.add_argument('--train_pos_data_path', type=str, default="../../SUZ12/SUZ12_positive_augmentation_includeOrig_training.fa", help='training positive data path')
+    parser.add_argument('--train_neg_data_path', type=str, default="../../SUZ12/SUZ12_negative_dinuclShuffle_augmentation_includeOrig_training.fa", help='training negative data path')
+    parser.add_argument('--test_pos_data_path', type=str, default="../../SUZ12/SUZ12_positive_test.fa", help='testing positive data path')
+    parser.add_argument('--test_neg_data_path', type=str, default="../../SUZ12/SUZ12_negative_test.fa", help='testing negative data path')
 
     parser.add_argument('--train_dNase_path', type=str, default="../../dNase/h1hesc_dnase.training.score", help='training score data path')
     parser.add_argument('--train_seq_path', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training seq data path')
@@ -46,6 +46,8 @@ def main():
     parser.add_argument('--dNase_feature_dim', type=int, default=64)
     parser.add_argument('--dNase_conv_filter_size_list', type=list, default=[3,7,11])
 
+    parser.add_argument('--num_workers', type=int, default=2)
+
     parser.add_argument('--cuda', type=int, default=-1)
     parser.add_argument('--eval', action='store_true', default=False)
     parser.add_argument('--load', type=str, default="model.t7", help='model to load')
@@ -57,10 +59,13 @@ def main():
 
     print("Task:",args.task)
     if args.task == 'TFBind':
-        train_loader, valid_loader, test_loader = prepare_all_data(args.train_pos_data_path,args.train_neg_data_path,args.test_pos_data_path,args.test_neg_data_path, args.batch_size, train_supernet=True)
+        train_loader, valid_loader, test_loader = prepare_all_data(args.train_pos_data_path,args.train_neg_data_path,args.test_pos_data_path,args.test_neg_data_path, args.batch_size,args.num_workers, train_supernet=True)
         trainer = ezGenoTrainer(args)
     elif args.task == 'AcEnhancer':
-        train_loader, valid_loader, test_loader = prepare_all_AcEnhancer_data(args.train_seq_path,args.train_dNase_path,args.train_label_path,args.test_seq_path,args.test_dNase_path,args.test_label_path, args.batch_size, train_supernet=True)        
+        start_time = time.time()
+        train_loader, valid_loader, test_loader = prepare_all_AcEnhancer_data(args.train_seq_path,args.train_dNase_path,args.train_label_path,args.test_seq_path,args.test_dNase_path,args.test_label_path, args.batch_size,args.num_workers, train_supernet=True)        
+        end_time = time.time()
+        print("prepare data time: %.3fs"%(end_time - start_time))
         trainer = AcEnhancerTrainer(args)
     if args.eval:
         trainer.test(trainer.subnet,test_loader)
