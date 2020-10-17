@@ -42,37 +42,6 @@ class ezGenoTrainer():
             print("loading model {}".format(args.load))
             self.load_model(args)
             
-
-	#load model        
-        if os.path.isfile(args.load):
-            checkpoint = torch.load(args.load)
-
-            self.best_arch   = checkpoint["best_arch"]
-            self.info= checkpoint["info"]
-            self.feature_dim = self.info["feature_dim"]
-            self.conv_filter_size_list= self.info["conv_filter_size_list"]
-            self.layers= self.info["layers"]
-
-            self.supernet = ezGenoModel(layers=self.layers, feature_dim=self.feature_dim)
-            self.controller = Controller(args, self.supernet.num_conv_choice,self.layers)
-
-            try:
-                self.supernet.load_state_dict(checkpoint["supernet_state_dict"])
-            except:
-                print("fail to load supernet. please check whether the setting is the same as the checkpoint.")
-
-            try:
-                self.controller.load_state_dict(checkpoint["controller_state_dict"])
-            except:
-                print("fail to load controller. please check whether the setting is the same as the checkpoint.")
-
-            if self.best_arch is not None:
-                self.subnet = ezGenoModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim)
-            if checkpoint["subnet_state_dict"] is not None:
-                try:
-                    self.subnet.load_state_dict(checkpoint["subnet_state_dict"])
-                except:
-                    print("fail to load subnet. please check whether the setting is the same as the checkpoint.")
         else:
             print("no checkpoint found.")
             self.layers = args.layers
