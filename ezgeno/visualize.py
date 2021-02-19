@@ -287,12 +287,12 @@ if __name__ == '__main__':
     args, unparsed = parser.parse_known_args()
     print(args)
 
-    checkpoint = torch.load(args.model_path)
+    checkpoint = torch.load(args.load)
     info=checkpoint["info"]
     model=ezGenoModel(arch=checkpoint["best_arch"],layers=info["layers"], feature_dim=info["feature_dim"])
     
 
-    show_grad_cam(args,args.model_path,args.dataName,model)
+    show_grad_cam(args,args.load,args.dataName,model)
     end_time = time.time()
     duration = end_time - start_time
     print("total time: %.3fs"%(duration))
