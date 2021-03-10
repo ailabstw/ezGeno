@@ -11,7 +11,6 @@ we are going to release a new version of ezGeno in the end of March. With the ne
 skip the step of modifying the Python codes before conducting a new task with different input combinations. ezGeno will 
 create the search space of network architectures according to the input files automatically.
 ```
-<font color='red'>test blue color font</font>
 
 ## workflow
 
