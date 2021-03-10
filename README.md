@@ -5,7 +5,7 @@ This repository contains a pytorch implementation of an eNAS algorithm, where pa
 * predicting TF binding. The basic architecture of this idea was built based on DeepBind (https://github.com/kundajelab/deepbind).
 * predicting activity of enhancers. The basic architecture of this idea was built based on accuEnhancer.
 
-![#f03c15] News: `#f03c15` we are going to release a new version of ezGeno in the end of March. With the new design of input setting, the users can skip the step of modifying the Python codes before conducting a new task with different input combinations. ezGeno will create the search space of network architectures according to the input files automatically.
+`#f03c15`News:  we are going to release a new version of ezGeno in the end of March. With the new design of input setting, the users can skip the step of modifying the Python codes before conducting a new task with different input combinations. ezGeno will create the search space of network architectures according to the input files automatically.
 ## workflow
 
 ### Contents
