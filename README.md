@@ -2,10 +2,12 @@
 
 ```diff
 - News: 
-we are going to release a new version of ezGeno in the end of March. With the new design of input setting, the users can 
-skip the step of modifying the Python codes before conducting a new task with different input combinations. ezGeno will 
-create the search space of network architectures according to the input files automatically.
+we are going to release a new version of ezGeno in the end of March. With the new design of input setting, 
+the users can skip the step of modifying the Python codes before conducting a new task with different 
+input combinations. ezGeno will create the search space of network architectures according to the 
+input files automatically.
 ```
+
 ezGeno is an implementation of the efficient neural architecture search algorithm specifically tailored for genomic sequence categorization, for example predicting transcription factor (TF) binding sites and histone modifications. 
 
 This repository contains a pytorch implementation of an eNAS algorithm, where parameters can be altered and adjusted by users. Here, we used two examples to demonstrate how ezGeno can be applied to employ deep learning on genomic data categorization:
