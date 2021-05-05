@@ -6,96 +6,114 @@ import torch
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from torch.utils.data.sampler import SubsetRandomSampler
 from utils import *
+import csv
 
 class trainset(Dataset):
-    def __init__(self, train_pos_data_path,train_neg_data_path, transform=None):
+    def __init__(self,dataSource, labelFileName,FeaureFileList):
 
-        positive_list = []
-        try:
-            with open(train_pos_data_path) as outputfile:
-                for sequence in outputfile:
-                    positive_list.append(str(sequence.split()[0]))
-        except:
-            print('can not find the training positive data')
-        print("the number of training positive sequence: {}".format(len(positive_list)))
+        i=0
+        data=[]
 
-        negative_list=[]
-        try:
-            with open(train_neg_data_path) as outputfile:
-                for sequence in outputfile:
-                    negative_list.append(str(sequence.split()[0]))
-        except:
-            print('can not find the training positive data')
-        print("the number of training negative sequence: {}".format(len(negative_list)))
+        for fileName in FeaureFileList:
+            print("fileName",fileName)
+            data.append([])
+            if dataSource[i]==1:
+                #read seq file 
+                with open(fileName,'r') as f:
+                    for sequence in f:
+                        data[i].append(str(sequence.split()[0]))
+                print(len(data[i]))
+            else:
+                #read other file 
+                with open(fileName, 'r') as f:
+                    reader = csv.reader(f, delimiter=" ")
+                    tmp = np.array(list(reader))
+                    tmp = np.delete(tmp, -1, axis=1).astype(float)
+                    data[i]=tmp
+            i+=1
 
-        data = negative_list + positive_list
-        labels = np.ones(len(data), dtype=int)
-        labels[0 : len(negative_list) -1 ] = 0
-        shuffle_data = list(zip(data, labels))
-        random.shuffle(shuffle_data)
-        data, labels = zip(*shuffle_data)
+        self.labels =np.loadtxt(labelFileName).astype(int)
+        indices = np.arange(len(self.labels)).astype(int)
+        np.random.shuffle(indices)
+        self.labels=self.labels[indices]
+        
+        self.np_data=[]
 
-        self.encoded_training = np.transpose(np.array(onehot_encode_sequences(np.array(data)), dtype='float32'), (0, 2, 1))
-        #self.encoded_training = np.stack(onehot_encode_sequences(data))
-        self.train_labels = np.array(labels)
-
-        self.transform = transform
-
+        i=0
+        for i in range(len(dataSource)):
+            if dataSource[i]==1:
+                self.np_data.append(np.transpose(np.array(onehot_encode_sequences(np.array(data[i])), dtype='float32')[indices], (0, 2, 1)))
+            else:
+                data[i]=data[i][indices]
+                self.np_data.append(np.expand_dims(data[i], axis=1))
+            print(self.np_data[i].shape)
+        
     def __getitem__(self, index):
-        data = self.encoded_training[index]
-        label = self.train_labels[index]
-        data = np.expand_dims(data, axis=0)
-        if self.transform:
-            data = self.transform(data)
-        return data, label
+        return [self.np_data[i][index] for i in range(len(self.np_data))],self.labels[index]
 
     def __len__(self):
-        return len(self.encoded_training)
+        return len(self.labels)
 
 class testset(Dataset):
-    def __init__(self, test_pos_data_path,test_neg_data_path):
+    def __init__(self,dataSource, labelFileName,FeaureFileList):
 
-        test_pos_list = []
-        try:
-            with open(test_pos_data_path) as outputfile:
-                for sequence in outputfile:
-                    test_pos_list.append(str(sequence.split()[0]))
-        except:
-            print('can not find the testing positive data')
-        print("the number of testing positive sequence: {}".format(len(test_pos_list)))
+        i=0
+        data=[]
 
-        test_negative_list = []
-        try:
-            with open(test_neg_data_path) as outputfile:
-                for sequence in outputfile:
-                    test_negative_list.append(str(sequence.split()[0]))
-        except:
-            print('can not find the testing negative data')
-        print("the number of testing negative sequence: {}".format(len(test_negative_list)))
+        for fileName in FeaureFileList:
+            print("fileName",fileName)
+            data.append([])
+            if dataSource[i]==1:
+                #read seq file 
+                with open(fileName,'r') as f:
+                    for sequence in f:
+                        data[i].append(str(sequence.split()[0]))
+                print(len(data[i]))
+            else:
+                #read other file 
+                with open(fileName, 'r') as f:
+                    reader = csv.reader(f, delimiter=" ")
+                    tmp = np.array(list(reader))
+                    tmp = np.delete(tmp, -1, axis=1).astype(float)
+                    data[i]=tmp
+            i+=1
 
+        self.labels =np.loadtxt(labelFileName).astype(int)
+        indices = np.arange(len(self.labels)).astype(int)
+        np.random.shuffle(indices)
+        self.labels=self.labels[indices]
+        
+        self.np_data=[]
 
-        test_data = test_pos_list + test_negative_list
-        test_labels = np.zeros(len(test_data), dtype = int)
-        test_labels[0 : len(test_pos_list) -1 ] = 1
-        #test_shuffle_data = list(zip(test_data, test_labels))
-        #test_data, test_labels = zip(*test_shuffle_data)
-
-        self.encoded_test = np.transpose(np.array(onehot_encode_sequences(np.array(test_data)), dtype='float32'), (0, 2, 1))
-        #self.encoded_test = np.stack(onehot_encode_sequences(test_data))
-        self.test_labels = np.array(test_labels)
-
+        i=0
+        for i in range(len(dataSource)):
+            if dataSource[i]==1:
+                self.np_data.append(np.transpose(np.array(onehot_encode_sequences(np.array(data[i])), dtype='float32')[indices], (0, 2, 1)))
+            else:
+                data[i]=data[i][indices]
+                self.np_data.append(np.expand_dims(data[i], axis=1))
+            print(self.np_data[i].shape)
+        
     def __getitem__(self, index):
-        data = self.encoded_test[index]
-        label = self.test_labels[index]
-        data = np.expand_dims(data, axis=0)
-        return data, label
+        return [self.np_data[i][index] for i in range(len(self.np_data))],self.labels[index]
 
     def __len__(self):
-        return len(self.encoded_test)
+        return len(self.labels)
 
-def prepare_all_data(train_pos_data_path,train_neg_data_path,test_pos_data_path,test_neg_data_path, batch_size,num_workers, train_supernet=True):
-    train_data = trainset(train_pos_data_path,train_neg_data_path)
-    test_data = testset(test_pos_data_path,test_neg_data_path)
+
+def prepareAllData(trainFileListStr,trainLabelPath,testFileListStr,testLabelPath,batch_size,num_workers, train_supernet=True):
+
+
+    trainFileList=trainFileListStr.split(',')
+    testFileList=testFileListStr.split(',')
+    # seq => 1 ,1Dvector=>0
+    dataSource= [1 if trainFileList[i].endswith('.sequence') else 0 for i in range(len(trainFileList))]
+    print("dataSource",dataSource)
+    print("type(trainFileList)",len(trainFileList))
+    print("type(testFileList)",len(testFileList))
+
+    train_data = trainset(dataSource,trainLabelPath,trainFileList)
+    test_data = testset(dataSource,testLabelPath,testFileList)
 
     if train_supernet:
 
@@ -111,10 +129,10 @@ def prepare_all_data(train_pos_data_path,train_neg_data_path,test_pos_data_path,
         valid_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=valid_sampler, pin_memory=True, num_workers=num_workers)
         test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
 
-        return train_loader, valid_loader, test_loader
+        return train_loader, valid_loader, test_loader ,dataSource
     
     else:
-        train_data = trainset(data_path, transform=transforms.Compose([RandomShift(30)]))
+
         train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, pin_memory=True, num_workers=num_workers)
         test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
-        return train_loader, test_loader
+        return train_loader, test_loader,dataSource
