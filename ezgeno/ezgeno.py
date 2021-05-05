@@ -27,12 +27,18 @@ def main():
     parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight decay')
 
+    parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.training.sequence", help='training file list path')
+    parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.testing.sequence", help='testing file list path')
+    parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.training.label", help='testing negative data path')
+    parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.testing.label", help='testing negative data path')
+    
     #parser.add_argument('--trainFileList', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training file list path')
+    """
     parser.add_argument('--trainFileList', type=str ,default="../../SUZ12/SUZ12.training.sequence", help='training file list path')
     parser.add_argument('--testFileList', type=str ,default="../../SUZ12/SUZ12.testing.sequence", help='testing file list path')
     parser.add_argument('--trainLabel', type=str, default="../../SUZ12/SUZ12.training.label", help='testing negative data path')
     parser.add_argument('--testLabel', type=str, default="../../SUZ12/SUZ12.testing.label", help='testing negative data path')
-
+    """
     """
     parser.add_argument('--train_pos_data_path', type=str, default="../../SUZ12/SUZ12_positive_augmentation_includeOrig_training.fa", help='training positive data path')
     parser.add_argument('--train_neg_data_path', type=str, default="../../SUZ12/SUZ12_negative_dinuclShuffle_augmentation_includeOrig_training.fa", help='training negative data path')
@@ -62,11 +68,12 @@ def main():
     parser.add_argument('--eval', action='store_true', default=False)
     parser.add_argument('--load', type=str, default="model.t7", help='model to load')
     parser.add_argument('--save', type=str, default="model.t7", help='model to save')
-
+    parser.add_argument('--seed',help='seed number',type=int,default=0)
 
     args, unparsed = parser.parse_known_args()
-  
+
     print(args)
+    set_seed(args.seed)
 
     train_loader, valid_loader, test_loader,dataSource = prepareAllData(args.trainFileList,args.trainLabel,args.testFileList,args.testLabel,args.batch_size,args.num_workers, train_supernet=True)
     trainer = ezGenoTrainer(args,dataSource)

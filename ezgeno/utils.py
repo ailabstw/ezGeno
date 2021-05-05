@@ -3,6 +3,7 @@ import sys
 import time
 import math
 import numpy as np
+import random
 
 import torch
 import torch.nn as nn
@@ -83,3 +84,18 @@ def choose_optimizer(optimizerName,model,learning_rate,parameters_list):
     else:
         optimizer = torch.optim.Adagrad(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     return optimizer
+
+def set_seed(seed: int):
+    """
+    Helper function for reproducible behavior to set the seed in ``random``, ``numpy``, ``torch`` and/or ``tf`` (if
+    installed).
+
+    Args:
+        seed (:obj:`int`): The seed to set.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
