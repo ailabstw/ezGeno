@@ -8,7 +8,7 @@ from utils import *
 from trainer import ezGenoTrainer
 from network import ezGenoModel
 from dataset import *
-from AcEnhancerDataset import *
+#from AcEnhancerDataset import *
 
 warnings.simplefilter('once', UserWarning)
 
