@@ -38,7 +38,7 @@ class ezGenoTrainer():
         self.optimizer=args.optimizer
         self.controller_optimizer=args.controller_optimizer
         
-        if os.path.isfile(args.load and args.task="TFBind"):
+        if os.path.isfile(args.load) and args.task=="TFBind":
             print("loading model {}".format(args.load))
             self.load_model(args)
             

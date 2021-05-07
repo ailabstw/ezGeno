@@ -66,10 +66,10 @@ class testset(Dataset):
         #test_shuffle_data = list(zip(seq_data,dNase_data, test_labels))
         #seq_datas,dNase_datas, test_labels = zip(*test_shuffle_data)
 
-        self.encoded_seq = np.transpose(np.array(onehot_encode_sequences(np.array(seq_datas)), dtype='float32'), (0, 2, 1))
+        self.encoded_seq = np.transpose(np.array(onehot_encode_sequences(np.array(seq_data)), dtype='float32'), (0, 2, 1))
         #self.encoded_seq = np.stack(np.array(onehot_encode_sequences(seq_datas),dtype='float32'))
         self.test_labels = np.array(test_labels)
-        self.dNasedata =np.expand_dims(dNase_datas, axis=1)
+        self.dNasedata =np.expand_dims(dNase_data, axis=1)
         print('self.encoded_testing:',self.encoded_seq.shape)
         print('self.dNase_datas:',self.dNasedata.shape)
     def __getitem__(self, index):
