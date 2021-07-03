@@ -224,6 +224,7 @@ class ezGenoTrainer():
             
             self.best_arch = self.controller.sample(is_train=False)
             print("self.best_arch",self.best_arch)
+            outputArch(self.best_arch,self.conv_filter_size_list)
             if self.task == "TFBind":
                 print("self.task",self.task)
                 self.subnet = ezGenoModel(arch=self.best_arch, layers=self.layers, feature_dim=self.feature_dim)

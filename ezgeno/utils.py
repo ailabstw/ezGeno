@@ -83,3 +83,21 @@ def choose_optimizer(optimizerName,model,learning_rate,parameters_list):
     else:
         optimizer = torch.optim.Adagrad(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     return optimizer
+
+def outputArch(arch,conv_filter_size_list):
+    print("the Architecture of the network we choosed is:")
+    print("==============================================")
+    for index in range(len(arch)):
+        # conv layer
+        if (index%2)==0:
+            if arch[index]%2==0:
+                print("conv:{}".format(conv_filter_size_list[arch[index]//2]))
+            else:
+                print("conv:{} +dilation".format(conv_filter_size_list[arch[index]//2]))
+        #connect layer
+        else:
+            if arch[index]==0:
+                print("no connection layer added")
+            else:
+                print("connect layer {}".format(arch[index]))
+    print("==============================================")
