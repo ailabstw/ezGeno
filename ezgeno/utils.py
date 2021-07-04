@@ -93,7 +93,7 @@ def outputArch(arch,conv_filter_size_list):
             if arch[index]%2==0:
                 print("conv:{}".format(conv_filter_size_list[arch[index]//2]))
             else:
-                print("conv:{} +dilation".format(conv_filter_size_list[arch[index]//2]))
+                print("conv:{} + dilation".format(conv_filter_size_list[arch[index]//2]))
         #connect layer
         else:
             if arch[index]==0:
