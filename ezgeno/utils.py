@@ -97,5 +97,28 @@ def set_seed(seed: int):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+    #torch.backends.cudnn.deterministic = True
+    #torch.backends.cudnn.benchmark = False
+
+def outputArch(arch,conv_filter_size_list,layers):
+    print("the Architecture of the network we choosed is:")
+    print("==============================================")
+    #arch[2*arch_count:2*(arch_count+layers[i])]
+    #arch_count+=self.layers[i]
+    arch_count=0
+    for i in range(len(layers)):
+        for index in range(2*arch_count,2*(arch_count+layers[i])):
+            # conv layer
+            if (index%2)==0:
+                if arch[index]%2==0:
+                    print("conv:{}".format(conv_filter_size_list[i][arch[index]//2]))
+                else:
+                    print("conv:{} + dilation".format(conv_filter_size_list[i][arch[index]//2]))
+            #connect layer
+            else:
+                if arch[index]==0:
+                    print("no connection layer added")
+                else:
+                    print("connect layer {}".format(arch[index]))
+        arch_count+=layers[i]
+    print("==============================================")

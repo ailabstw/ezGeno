@@ -247,6 +247,7 @@ class ezGenoTrainer():
             
             self.best_arch = self.controller.sample(is_train=False)
             print("self.best_arch",self.best_arch)
+            outputArch(self.best_arch,self.conv_filter_size_list,self.layers)
 
             self.subnet = ezGenoModel(self.dataSource,self.layers, self.feature_dim,self.conv_filter_size_list,device=self.device,arch=self.best_arch)
             self.subnet_optimizer = choose_optimizer(self.optimizer,self.subnet,self.learning_rate,[self.weight_decay,self.momentum])

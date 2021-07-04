@@ -27,17 +27,25 @@ def main():
     parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight decay')
 
+    parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.score", help='training file list path')
+    parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.score", help='testing file list path')
+    parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training_label", help='testing negative data path')
+    parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation_label", help='testing negative data path')
+    
+    
+    #parser.add_argument('--trainFileList', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training file list path')
+    """
     parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.training.sequence", help='training file list path')
     parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.testing.sequence", help='testing file list path')
     parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.training.label", help='testing negative data path')
     parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.testing.label", help='testing negative data path')
     
-    #parser.add_argument('--trainFileList', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training file list path')
-    """
     parser.add_argument('--trainFileList', type=str ,default="../../SUZ12/SUZ12.training.sequence", help='training file list path')
-    parser.add_argument('--testFileList', type=str ,default="../../SUZ12/SUZ12.testing.sequence", help='testing file list path')
-    parser.add_argument('--trainLabel', type=str, default="../../SUZ12/SUZ12.training.label", help='testing negative data path')
-    parser.add_argument('--testLabel', type=str, default="../../SUZ12/SUZ12.testing.label", help='testing negative data path')
+    
+    parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.score", help='training file list path')
+    parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.score", help='testing file list path')
+    parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training_label", help='testing negative data path')
+    parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation_label", help='testing negative data path')
     """
     """
     parser.add_argument('--train_pos_data_path', type=str, default="../../SUZ12/SUZ12_positive_augmentation_includeOrig_training.fa", help='training positive data path')
