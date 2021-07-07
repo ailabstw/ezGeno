@@ -8,7 +8,7 @@ This preprocessing script helps to
   (3) finally we will get posistive data(eg:JUND_positive_data.fa) and negative data( eg:JUND_dinucleotide_negative_data.fa) for ezgeno input
 ## Usage
 ```bash
-usage: ezgeno.py  [-h help] 
+usage: createdata.py  [-h help] 
                   [--filename FILENAME]                  
                   [--augment AUGMENT] 
                   [--neg_type NEG_TYPE]
