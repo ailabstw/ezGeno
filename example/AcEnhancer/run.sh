@@ -4,6 +4,5 @@ comment
 <<comment
 2.run ezgeno code
 comment
-python3 ../../ezgeno/ezgeno.py --task AcEnhancer --cuda 0 --train_dNase_path ./h1hesc_dnase.training.score --train_seq_path ./h1hesc_dnase.training_input_seq 
---train_label_path ./h1hesc_dnase.training_label --test_dNase_path ./h1hesc_dnase.validation.score --test_seq_path ./h1hesc_dnase.validation_input_seq --test_label_path ./h1hesc_dnase.validation_label
+python3 ../../ezgeno/ezgeno.py --trainFileList /volume/tsungting/ezgeno/eNAS/epigenome/data/h1hesc_dnase.training.score,/volume/tsungting/ezgeno/eNAS/epigenome/data/h1hesc_dnase.training_input.sequence  --trainLabel /volume/tsungting/ezgeno/eNAS/epigenome/data/h1hesc_dnase.training_label --testFileList /volume/tsungting/ezgeno/eNAS/epigenome/data/h1hesc_dnase.validation.score,/volume/tsungting/ezgeno/eNAS/epigenome/data/h1hesc_dnase.validation_input.sequence --testLabel /volume/tsungting/ezgeno/eNAS/epigenome/data/h1hesc_dnase.validation_label --cuda 0  --save example.model
 <<comment
