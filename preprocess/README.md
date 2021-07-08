@@ -12,6 +12,8 @@ usage: createdata.py  [-h help]
                   [--filename FILENAME]                  
                   [--augment AUGMENT] 
                   [--neg_type NEG_TYPE]
+                  [--reverse REVERSE] 
+                  [--outputprefix OUTPUTPREFIX]
                   
 Required arguments:
   --filename    
@@ -21,8 +23,14 @@ Required arguments:
                         Augment data with random sampling. Recommended when data points are less than 10,000.
                         [Type: bool,default: True]  
   --neg_type
-                        Select a type of negative data to train your model with. ex: "dinucleotide".
+                        Select a type of negative data to train your model with or specify negative file  ex: "dinucleotide".
                         [Type: String,default:dinucleotide] 
+  --reverse                 
+                        Augment data by reverse complement.
+                        [Type: bool,default: True]
+  --outputprefix        
+                        Add output prefix into filename.
+                        [Type: String] 
 ```
 ## Example:
 
