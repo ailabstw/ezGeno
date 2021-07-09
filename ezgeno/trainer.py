@@ -88,7 +88,7 @@ class ezGenoTrainer():
             self.subnet_optimizer = choose_optimizer(self.optimizer,self.subnet,self.learning_rate,[self.weight_decay,self.momentum])
         else:
             self.subnet_optimizer = None
-        self.info={'layers':self.layers,'feature_dim':self.feature_dim,'conv_filter_size_list':self.conv_filter_size_list}
+        self.info={'dataSource':self.dataSource,'layers':self.layers,'feature_dim':self.feature_dim,'conv_filter_size_list':self.conv_filter_size_list}
 
 
     def train_supernet(self,model, train_loader, optimizer, criterion, epoch, get_random_cand=None, arch=None):

@@ -13,6 +13,7 @@ from torch.autograd import Variable
 from network import ezGenoModel
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from utils import *
+from dataset import testset
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -21,6 +22,7 @@ import matplotlib.cm as cm
 
 from matplotlib.backends.backend_pdf import PdfPages
 import heapq
+import ast
 
 class FeatureExtractor():
     def __init__(self, model, target_layers):
@@ -35,12 +37,12 @@ class FeatureExtractor():
         outputs = []
         self.gradients = []
 
-        x =self.model.bn(x)
+        x =self.model.bn[0](x)
         x = x.squeeze(0)
         feature_maps = []
         i=0
 
-        for name, module in self.model.features._modules.items():
+        for name, module in self.model.features[0]._modules.items():
             block_id=self.model.arch[2*i]
             connect_id=self.model.arch[2*i+1]
             x = module[block_id](x)
@@ -53,7 +55,7 @@ class FeatureExtractor():
             feature_maps.append(x)
             i=i+1
 
-        x=self.model.globalpooling(x)
+        x=self.model.globalpooling[0](x)
         return outputs, x
 
 
@@ -79,6 +81,8 @@ class GradCam:
         self.seq_length =seq_length
         if self.cuda:
             self.model = model.cuda()
+            #only for one input file
+            self.model.bn[0] = model.bn[0].cuda()
 
         self.extractor = ModelOutputs(self.model, target_layer_names)
 
@@ -208,10 +212,11 @@ def write_heatmap(filename,mask,seq):
             pdf.savefig()  # saves the current figure into a pdf page
             plt.close()
 
-def show_grad_cam(args,model_path,dataName,model,window=9):
+def show_grad_cam(args,model_path,dataName,model,use_cuda,window=9):
     print("show_grad_cam")
     fo = open("{}_grad_cam.csv".format(dataName), "w")
     test_data = gradCamTestset(args.data_path)
+    #test_data = testset(args.dataSource,testLabelPath,testFileList)
     seq_length=test_data.seq_length
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, num_workers=8)
     grad_cam = GradCam(model=model, target_layer_names=args.target_layer_names,seq_length=seq_length, use_cuda=True)
@@ -283,16 +288,17 @@ if __name__ == '__main__':
     parser.add_argument('--data_path', type=str, default="../SUZ12/SUZ12_positive_test.fa", help='input data')
     parser.add_argument('--dataName', type=str, default="SUZ12", help='from model to predict seq')
     parser.add_argument('--target_layer_names', type=str, default="[2]", help='want to extract features from target layers')
+    parser.add_argument('--use_cuda',help='True or False flag, input should be either "True" or "False".',type=ast.literal_eval, default=True,dest='use_cuda')
 
     args, unparsed = parser.parse_known_args()
     print(args)
 
     checkpoint = torch.load(args.load)
     info=checkpoint["info"]
-    model=ezGenoModel(arch=checkpoint["best_arch"],layers=info["layers"], feature_dim=info["feature_dim"])
-    
+    model=ezGenoModel(dataSource=info["dataSource"],arch=checkpoint["best_arch"],layers=info["layers"], feature_dim=info["feature_dim"],conv_filter_size_list=info["conv_filter_size_list"])
+    #self.subnet = ezGenoModel(self.dataSource,self.layers, self.feature_dim,self.conv_filter_size_list,arch=self.best_arch,device=self.device)
 
-    show_grad_cam(args,args.load,args.dataName,model)
+    show_grad_cam(args,args.load,args.dataName,model,args.use_cuda)
     end_time = time.time()
     duration = end_time - start_time
     print("total time: %.3fs"%(duration))

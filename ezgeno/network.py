@@ -8,7 +8,8 @@ class ezGenoModel(nn.Module):
         super(ezGenoModel, self).__init__()
 
         arch_count=0
-        archList=[]
+        self.arch=arch
+        self.archList=[]
 
         self.dataSource = dataSource
         self.layers = layers
@@ -26,9 +27,9 @@ class ezGenoModel(nn.Module):
 
         for i in range(len(self.layers)):
             if arch is not None:
-                archList.append(arch[2*arch_count:2*(arch_count+layers[i])])
+                self.archList.append(arch[2*arch_count:2*(arch_count+layers[i])])
             else:
-                archList.append([])
+                self.archList.append([])
             arch_count+=self.layers[i]
 
         #search space
@@ -45,7 +46,7 @@ class ezGenoModel(nn.Module):
                 #print("i j",i,j)
                 input_channel = self.channels[i][j]
                 output_channel = self.channels[i][j+1]
-                print(input_channel,output_channel)
+                #print(input_channel,output_channel)
                 for filter_size in self.conv_filter_size_list[i]:
                     self.features[i][-1].append(nn.Sequential(
                         nn.Conv1d(input_channel, output_channel, filter_size, stride=1, padding=(filter_size-1)//2),
@@ -56,10 +57,10 @@ class ezGenoModel(nn.Module):
                         nn.ReLU(),
                     ))
                 #print("len(self.features[i][-1])",len(self.features[i][-1]))
-                if archList[i] != []:
+                if self.archList[i] != []:
                     for k in range(len(self.features[i][-1])):
                         #print("k archList[i][2*j]",k,archList[i][2*j])
-                        if k != archList[i][2*j]:
+                        if k != self.archList[i][2*j]:
                             #print(self.features[i])
                             self.features[i][-1][k]=None
         

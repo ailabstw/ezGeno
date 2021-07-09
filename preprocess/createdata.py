@@ -10,6 +10,7 @@ from random import seed
 from random import randint
 import altschulEriksonDinuclShuffle as di
 import re
+import ast
 
 hg19_without_N = "PN_fasta/reference/hg19_rm_Ns.bed"
 hg38_without_N = "PN_fasta/reference/hg38_rm_Ns.bed"
@@ -28,16 +29,15 @@ def reverse_complement(dna):
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A','N': 'N'}
     return ''.join([complement[base] for base in dna[::-1]])
 
-def gen_positive_file(input_list,augment=True):
-
-	length =len(input_list) 
-	if augment:
-		for i in range(length,10000):
-			idx=randint(0,len(input_list)-1)
-			input_list.append(input_list[idx])
+def augment_sequence(input_list,length):
+	if len(input_list)>=length:
+		return input_list
+	for i in range(len(input_list),length):
+		idx=randint(0,len(input_list)-1)
+		input_list.append(input_list[idx])
 	return input_list      
 
-def gen_neg_dinc_file(input_list):
+def gen_neg_dinc(input_list):
 
 	negative_list = []
 	for sequence in input_list:
@@ -48,8 +48,7 @@ def gen_neg_dinc_file(input_list):
 		negative_list.append(negative_seq)
 	return negative_list
 
-def load_fasta(input):
-
+def load_fasta(input,reverse):
 	sequence_list = []
 	fasta_sequences = SeqIO.parse(open(input),'fasta')
 	with open(input) as outfile:
@@ -57,7 +56,8 @@ def load_fasta(input):
 			name, sequence = fasta.id, str(fasta.seq)
 			upper_sequence = sequence.upper()
 			sequence_list.append(upper_sequence)
-			sequence_list.append(reverse_complement(upper_sequence))
+			if reverse:
+				sequence_list.append(reverse_complement(upper_sequence))
 
 	return sequence_list
 
@@ -146,15 +146,24 @@ def create_negative_bed( pos_num, ratio , sequence_length,hg=38):
 
 
 
-def read_seq_file(filename):
+def read_seq_file(filename,reverse):
 	with open(filename) as f:
 	    lines = [line.rstrip() for line in f]
 	
-	sequence_list=[]
+	pos_sequence_list=[]
+	neg_sequence_list=[]
 	for idx in range(1,len(lines)):
 		element=lines[idx].split()
-		sequence_list.append(element[2])
-	return sequence_list
+		if int(element[3])==1:
+			pos_sequence_list.append(element[2])
+			if reverse:
+				pos_sequence_list.append(reverse_complement(element[2]))
+		elif int(element[3])==0:
+			neg_sequence_list.append(element[2])
+			if reverse:
+				neg_sequence_list.append(reverse_complement(element[2]))
+
+	return pos_sequence_list,neg_sequence_list
 
 def install_genome_fa(hg=38):
 	if hg ==19:
@@ -175,48 +184,77 @@ def install_genome_fa(hg=38):
 
 if __name__ == '__main__':
 	parser=argparse.ArgumentParser()
-	parser.add_argument("--filename",help="Enter .fasta file")
-	parser.add_argument("--augment",help="Augment data with random sampling", default=True)
-	parser.add_argument("--neg_type",help="Enter negative data type: dinucleotide or random",default="dinucleotide")
+	parser.add_argument("--filename",help="Enter input file name,file type can be .seq")
+	parser.add_argument('--reverse',help='True or False flag, input should be either "True" or "False".',type=ast.literal_eval, default=False,dest='reverse')
+	#parser.add_argument("--reverse",help="Augment data with reverse complement", default=True,type=bool)
+	parser.add_argument("--augment",help="the number of positive training data after augmentation",type=ast.literal_eval, default=False,dest='augment')
+	parser.add_argument("--augmentlength",help="Augment data with random sampling", default=10000)
+	parser.add_argument("--neg_type",help="Enter negative data type or file: dinucleotide,random,None or specify negative filename",default="dinucleotide")
+	parser.add_argument("--outputprefix",help="outputfile prefix name")
+
 	args=parser.parse_args()
+	print("args",args)
 
-	m=re.findall(r'(\S+?)_',args.filename )
-	data_Name=m[0]
+	if args.outputprefix:
+		data_Name=args.outputprefix
+	else:
+		m=re.findall(r'(\S+?)_',args.filename)
+		data_Name=m[0]
 	
+	pos_sequence_list=[]
+	neg_sequence_list=[]
 	if args.filename.endswith(".seq"):
-		sequence_list = read_seq_file(args.filename)
+		pos_sequence_list,neg_sequence_list = read_seq_file(args.filename,args.reverse)
 	else:
-		sequence_list = load_fasta(args.filename)
+		pos_sequence_list = load_fasta(args.filename,args.reverse)
+	print(len(pos_sequence_list))
+	print(len(neg_sequence_list))
+	if len(neg_sequence_list)==0:
+		if args.neg_type == 'dinucleotide':
+			neg_sequence_list = gen_neg_dinc(pos_sequence_list,)
+		elif args.neg_type == 'random':
+			pos_count,kept_count = rewrite_bed('PN_fasta/b.bed', int(seq_len))
+			create_bed_and_fasta(hg = 38)
+			create_negative_bed(int(pos_count), final_num_seq, int(seq_len))
+			os.system('rm -r positive.bed')
+			os.system('rm -r N_regions.bed')
+			os.system('rm -r negative.bed')
+			os.system('rm -r random_negative.bed')
+			os.system('rm -r all_excluded.bed')
+			os.system('rm -r merged_all_excluded.bed')
+			os.system('rm -r sorted_all_excluded.bed')
+			os.system('rm -r positive_fasta.fa')
+		else:
+			with open(args.neg_type ,'r') as f:
+				for line in f:
+					neg_sequence_list.append(line.strip())
 
-	seq_len=(len(sequence_list[0]))
+	#seq_len=(len(sequence_list[0]))
 	if args.augment == True:
-		augmented_sequence_list = gen_positive_file(sequence_list)
-	else:
-		augmented_sequence_list = gen_positive_file(sequence_list, augment=False)
-	final_num_seq = len(augmented_sequence_list)
+		pos_sequence_list = augment_sequence(pos_sequence_list,args.augmentlength)
+		neg_sequence_list = augment_sequence(neg_sequence_list,args.augmentlength)
+	"""
 	with open('{}_positive_data.fa'.format(data_Name), 'w') as f:
     		for item in augmented_sequence_list:
         		f.write("%s\n" % item)
+	"""
 
-	if args.neg_type == 'dinucleotide':
-		dinucleo_negative_list = gen_neg_dinc_file(augmented_sequence_list)
+	f_sequence = open('{}.sequence'.format(data_Name),'w') 
+	f_label = open('{}.label'.format(data_Name),'w') 
+	for item in pos_sequence_list:
+		f_sequence.write("%s\n" % item)
+		f_label.write("1\n")
+
+	for item in neg_sequence_list:
+		f_sequence.write("%s\n" % item)
+		f_label.write("0\n")
+		"""
 		with open('{}_dinucleotide_negative_data.fa'.format(data_Name), 'w') as f:
 			for item in dinucleo_negative_list:
 				f.write("%s\n" % item)
-
-	else:
-		pos_count,kept_count = rewrite_bed('PN_fasta/b.bed', int(seq_len))
-		create_bed_and_fasta(hg = 38)
-		create_negative_bed(int(pos_count), final_num_seq, int(seq_len))
-		os.system('rm -r positive.bed')
-		os.system('rm -r N_regions.bed')
-		os.system('rm -r negative.bed')
-		os.system('rm -r random_negative.bed')
-		os.system('rm -r all_excluded.bed')
-		os.system('rm -r merged_all_excluded.bed')
-		os.system('rm -r sorted_all_excluded.bed')
-		os.system('rm -r positive_fasta.fa')
-
+		"""
+	f_sequence.close()
+	f_label.close()
 
 
 
