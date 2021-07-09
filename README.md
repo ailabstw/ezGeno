@@ -102,18 +102,6 @@ Required arguments:
 Optional arguments:
   -h, --help            
                         Show this help message and exit
-  --task 
-                        "TFBind": predicting TF binding
-                        "AcEnhancer": predicting activity of enhancers
-                        [Type: String, default: "TFBind", options: "TFBind, AcEnhancer"]
-                        
-  --negative_data_method NEGATIVE_DATA_METHOD  
-                        If not given the negative training data, ezGeno will generate 
-                        negative data based on the selected methods.
-                        "random": random sampling from the human genome.
-                        "dinucl": generate negative sequence based on the same dinucleotide
-                                  composition of the positive training data.
-                        [Type: String, Default:"dinucl", options: "random, dinucl"]
                         
   --epochs EPOCHS
                         Number of epochs for training searched model. 
@@ -181,6 +169,19 @@ Optional arguments:
                         This flag is used to predict testing data directly. 
                         It is usually used with "load" parameter.
                         [Type: Bool, default: False]
+                      
+  --task 
+                        "TFBind": predicting TF binding
+                        "AcEnhancer": predicting activity of enhancers
+                        [Type: String, default: "TFBind", options: "TFBind, AcEnhancer"]
+                        
+  --negative_data_method NEGATIVE_DATA_METHOD  
+                        If not given the negative training data, ezGeno will generate 
+                        negative data based on the selected methods.
+                        "random": random sampling from the human genome.
+                        "dinucl": generate negative sequence based on the same dinucleotide
+                                  composition of the positive training data.
+                        [Type: String, Default:"dinucl", options: "random, dinucl"]
                        
   --load 
                         This parameter is treated as loaded path. We will load modules from this path.
@@ -228,19 +229,19 @@ users can run a sample dataset with the following: "./example/tfbind/run.sh".
 Please refer to the ReadMe file in the preprocessing folder
 ### 2. eNAS
 ```python
- python3 ezgeno.py --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
+ python3 ezgeno.py --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
  ```
 #### (optional) modify layers parameters 
 ```python
- python3 ezgeno.py --layers 6 --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
+ python3 ezgeno.py --layers 6 --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
  ```
 #### (optional) modify search space (convolution filter size) parameters 
 ```python
- python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19] --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa  
+ python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19]  --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa  
  ```
 #### (optional) modify the number of output channels parameters 
 ```python
- python3 ezgeno.py --feature_dim 128 --task TFBind --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
+ python3 ezgeno.py --feature_dim 128 --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
  ```
 #### (optional) load model and predict
 ```python
@@ -287,7 +288,7 @@ python3 ezgeno.py --trainFileList ./h1hesc_dnase.training.score,./h1hesc_dnase.t
 
 ### (optional) load model and predict 
 ``` python
- python3 ezgeno.py --task AcEnhancer --cuda 0 
+ python3 ezgeno.py --cuda 0 
 ``` 
 
 ### Performance Evaluation
