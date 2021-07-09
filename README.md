@@ -64,10 +64,10 @@ This repository contains a pytorch implementation of an eNAS algorithm, where pa
 usage: ezgeno.py  [-h help] 
                   [--task TASK]
                   
-                  [--train_pos_data_path POSITIVE_TRAINING_DATA] 
-                  [--train_neg_data_path NEGATIVE_TRAINING_DATA]
-                  [--test_pos_data_path POSITIVE_TESTING_DATA] 
-                  [--test_neg_data_path NEGATIVE_TESTING_DATA]
+                  [--trainFileList TRAINING_DATA] 
+                  [--trainLabel TRAINING_LABEL]
+                  [--testFileList TESTING_DATA] 
+                  [--testLabel TESTING_LABEL]
 
                   [--batch_size BATCH_SIZE] [--optimizer OPTIMIZER]
                   [--epochs EPOCHS] [--learning_rate LEARNING_RATE] 
@@ -155,19 +155,22 @@ Optional arguments:
                         [Type: String, default: "Normal"]
                         
   --layers 
+                        can specify layers from multiple input files respectively seperated by space.
                         1. In TFBind task, we use this parameter to determine the layers of convolution units.
-                        2. In AcEnhancer task, we use this parameter to determine the layers of convolution units in sequence module.
+                        2. In AcEnhancer task, we can use this parameter to determine the layers of convolution units from two inputs.
                         [Type: int, default: 3]
   --feature_dim
+                        can specify layers from multiple input files respectively seperated by space.
                         1. In TFBind task, we use this parameter to determine the number of convolution filters.
-                        2. In AcEnhancer task, we use this parameter to determine the number of convolution filters in sequence module.
+                        2. In AcEnhancer task, we can use this parameter to determine the number of convolution filters from two inputs.
                         [Type: int, default: 64]
   --conv_filter_size_list
+                        can specify convolution filters from multiple input files respectively represented by like 2d-array.
                         1. In TFBind task, we use this parameter to determine the filter size list of convolution filters. Our purposed method will 
                         find the best filter size from this list by reinforcement learning.
-                        2. In AcEnhancer task, we use this parameter to determine the filter size list of convolution filters in sequence module.
-                        Our purposed method will find the best filter size from this list by reinforcement learning.
-                        [Type: List, default: [3,7,11,15,19] ]
+                        2. In AcEnhancer task, we can use this parameter to determine the filter size list of convolution filters from two inputs.
+                        Our purposed method will find the best filter size from user-defined parameter by reinforcement learning.
+                        [Type: str]
                                       
   --cuda 
                         We use this parameter to determine to use cuda or not. If you want to use gpu, you can type in gpu index, e.g.: 0.
@@ -275,9 +278,13 @@ users can run a sample dataset with the following: "./example/enhancer/run.sh".
 Please refer to the ReadMe file in the preprocessing folder
 ### train
 ``` python
-python3 ezgeno.py --task AcEnhancer --cuda 0 --train_dNase_path ../dNase/h1hesc_dnase.training.score --train_seq_path ../dNase/h1hesc_dnase.training_input_seq 
---train_label_path ../dNase/h1hesc_dnase.training_label --test_dNase_path ../dNase/h1hesc_dnase.validation.score --test_seq_path ../dNase/h1hesc_dnase.validation_input_seq --test_label_path ../dNase/h1hesc_dnase.validation_label
+python3 ezgeno.py --trainFileList ./h1hesc_dnase.training.score,./h1hesc_dnase.training_input.sequence  --trainLabel ./h1hesc_dnase.training_label --testFileList ./h1hesc_dnase.validation.score,./h1hesc_dnase.validation_input.sequence --testLabel ./h1hesc_dnase.validation_label --cuda 0  --save example.model
 ``` 
+### (optional) modify layers,feature_dim and conv_filter_size_list
+``` python
+python3 ezgeno.py --trainFileList ./h1hesc_dnase.training.score,./h1hesc_dnase.training_input.sequence  --trainLabel ./h1hesc_dnase.training_label --testFileList ./h1hesc_dnase.validation.score,./h1hesc_dnase.validation_input.sequence --testLabel ./h1hesc_dnase.validation_label --cuda 0  --save example.model --layers 6 6 --feature_dim 64 64 --conv_filter_size_list [[3,7,11,15,19],[3,7,11]]
+``` 
+
 ### (optional) load model and predict 
 ``` python
  python3 ezgeno.py --task AcEnhancer --cuda 0 
