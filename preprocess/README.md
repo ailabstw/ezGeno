@@ -23,13 +23,13 @@ Required arguments:
                         [Type: String]  
   --augment     
                         Augment data with random sampling. Recommended when data points are less than 10,000.
-                        [Type: bool,default: True]  
+                        [Type: bool,default: False]  
   --neg_type
                         Select a type of negative data to train your model with or specify negative file  ex: "dinucleotide".
                         [Type: String,default:dinucleotide] 
   --reverse                 
                         Augment reverse-complement data .
-                        [Type: bool,default: True]
+                        [Type: bool,default: False]
   --outputprefix        
                         Add output prefix into filename.
                         [Type: String] 
