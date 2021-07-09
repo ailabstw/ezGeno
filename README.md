@@ -92,7 +92,7 @@ Required arguments:
                         training label path. 
                         [Type: String]  
   --testFileList    
-                        test File path,can support multiple file input separated by comma.(only including DNA sequence and 1D-array).
+                        testing File path,can support multiple file input separated by comma.(only including DNA sequence and 1D-array).
                         In addition,you have to name file extension as ".sequence" if your input is DNA sequence.
                         [Type: String]  
   --testLabel
