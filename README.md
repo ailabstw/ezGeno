@@ -229,23 +229,23 @@ users can run a sample dataset with the following: "./example/tfbind/run.sh".
 Please refer to the ReadMe file in the preprocessing folder
 ### 2. eNAS
 ```python
- python3 ezgeno.py --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
+ python3 ezgeno.py --cuda 0 --trainFileList NFE2_training.sequence --trainLabel NFE2_training.label --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label --save example.model
  ```
 #### (optional) modify layers parameters 
 ```python
- python3 ezgeno.py --layers 6 --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
+ python3 ezgeno.py --layers 6 --cuda 0 --trainFileList NFE2_training.sequence --trainLabel NFE2_training.label --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label
  ```
 #### (optional) modify search space (convolution filter size) parameters 
 ```python
- python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19]  --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa  
+ python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19]  --cuda 0 --trainFileList NFE2_training.sequence --trainLabel NFE2_training.label --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label  
  ```
 #### (optional) modify the number of output channels parameters 
 ```python
- python3 ezgeno.py --feature_dim 128 --cuda 0 --train_pos_data_path ../SUZ12/SUZ12_positive_training.fa --train_neg_data_path ../SUZ12/SUZ12_negative_training.fa  --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa 
+ python3 ezgeno.py --feature_dim 128 --cuda 0 --trainFileList NFE2_training.sequence --trainLabel NFE2_training.label --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label 
  ```
 #### (optional) load model and predict
 ```python
- python3 ezgeno.py --load model.t7 --cuda 0 --eval --test_pos_data_path ../SUZ12/SUZ12_positive_test.fa --test_neg_data_path ../SUZ12/SUZ12_negative_test.fa
+ python3 ezgeno.py --load example.model --cuda 0 --eval True --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label 
 ```
 ### Performance evaluaion:
 
@@ -255,13 +255,12 @@ Please refer to the ReadMe file in the preprocessing folder
 
 ### 3. visualize and get sub sequence based on prediction model 
 ```python
- python3 visualize.py --load model.t7 --data_path ../SUZ12/SUZ12_positive_test.fa --dataName SUZ12 --target_layer_names "[2]"
+ python3 visualize.py --load example.model --data_path ./NFE2_positive_test.fa --dataName NFE2 --target_layer_names "[2]"
 ``` 
 #### (optional) you can choose sequence range which you want to show based on "show_seq" parameter. e.g.all,top-100,50-200
 ```python
- python3 visualize.py --show_seq top-200 --load model.t7 --data_path ../SUZ12/SUZ12_positive_test.fa --dataName SUZ12 --target_layer_names "[2]"
+ python3 visualize.py --show_seq top-200 --load example.model --data_path ./NFE2_positive_test.fa --dataName NFE2 --target_layer_names "[2]" --use_cuda True
 ``` 
-
 
 
 We highlight the important region in each sequence based on the predictive model. As shown in the image below, our model is able to identify regions that are important to determining possible binding sites.
@@ -288,7 +287,7 @@ python3 ezgeno.py --trainFileList ./h1hesc_dnase.training.score,./h1hesc_dnase.t
 
 ### (optional) load model and predict 
 ``` python
-python3 ezgeno.py --testFileList ./h1hesc_dnase.validation.score,./h1hesc_dnase.validation_input.sequence --testLabel ./h1hesc_dnase.validation_label --cuda 0 --load example.model --eval True
+ python3 ezgeno.py --cuda 0 --testFileList ./h1hesc_dnase.validation.score,./h1hesc_dnase.validation_input.sequence --testLabel ./h1hesc_dnase.validation_label --eval True
 ``` 
 
 ### Performance Evaluation
