@@ -83,12 +83,16 @@ def main():
     print(args)
     set_seed(args.seed)
 
-    train_loader, valid_loader, test_loader,dataSource = prepareAllData(args.trainFileList,args.trainLabel,args.testFileList,args.testLabel,args.batch_size,args.num_workers, train_supernet=True)
-    trainer = ezGenoTrainer(args,dataSource)
+
 
     if args.eval:
+        test_loader,dataSource = prepareAllData(args.trainFileList,args.trainLabel,args.testFileList,args.testLabel,args.batch_size,args.num_workers,args.eval, train_supernet=True)
+        trainer = ezGenoTrainer(args,dataSource)
+        print("loading model and predicting testing sequence")
         trainer.test(trainer.subnet,test_loader)
     else:
+        train_loader, valid_loader, test_loader,dataSource = prepareAllData(args.trainFileList,args.trainLabel,args.testFileList,args.testLabel,args.batch_size,args.num_workers,args.eval, train_supernet=True)
+        trainer = ezGenoTrainer(args,dataSource)
         trainer.train(train_loader, valid_loader,test_loader, enable_stage_1=True, enable_stage_2=True, enable_stage_3=True)
         trainer.test(trainer.subnet,test_loader)
 

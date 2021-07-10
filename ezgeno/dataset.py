@@ -101,38 +101,46 @@ class testset(Dataset):
         return len(self.labels)
 
 
-def prepareAllData(trainFileListStr,trainLabelPath,testFileListStr,testLabelPath,batch_size,num_workers, train_supernet=True):
+def prepareAllData(trainFileListStr,trainLabelPath,testFileListStr,testLabelPath,batch_size,num_workers,evaluate, train_supernet=True):
 
-
-    trainFileList=trainFileListStr.split(',')
-    testFileList=testFileListStr.split(',')
-    # seq => 1 ,1Dvector=>0
-    dataSource= [1 if trainFileList[i].endswith('.sequence') else 0 for i in range(len(trainFileList))]
-    print("dataSource",dataSource)
-    print("type(trainFileList)",len(trainFileList))
-    print("type(testFileList)",len(testFileList))
-
-    train_data = trainset(dataSource,trainLabelPath,trainFileList)
-    test_data = testset(dataSource,testLabelPath,testFileList)
-
-    if train_supernet:
-
-        dataset_size = len(train_data)
-        indices = list(range(dataset_size))
-        split = int(np.floor(0.2 * dataset_size))
-        #np.random.shuffle(indices)
-        train_indices, val_indices = indices[split:], indices[:split]
-        train_sampler = SubsetRandomSampler(train_indices)
-        valid_sampler = SubsetRandomSampler(val_indices)
-
-        train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=train_sampler, pin_memory=True, num_workers=num_workers)
-        valid_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=valid_sampler, pin_memory=True, num_workers=num_workers)
+    if evaluate:
+        testFileList=testFileListStr.split(',')
+        dataSource= [1 if testFileList[i].endswith('.sequence') else 0 for i in range(len(testFileList))]
+        print("dataSource",dataSource)
+        test_data = testset(dataSource,testLabelPath,testFileList)
         test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
-
-        return train_loader, valid_loader, test_loader ,dataSource
-    
+        return test_loader,dataSource
     else:
-
-        train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, pin_memory=True, num_workers=num_workers)
-        test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
-        return train_loader, test_loader,dataSource
+        trainFileList=trainFileListStr.split(',')
+        testFileList=testFileListStr.split(',')
+        # seq => 1 ,1Dvector=>0
+        dataSource= [1 if trainFileList[i].endswith('.sequence') else 0 for i in range(len(trainFileList))]
+        print("dataSource",dataSource)
+        print("type(trainFileList)",len(trainFileList))
+        print("type(testFileList)",len(testFileList))
+    
+        train_data = trainset(dataSource,trainLabelPath,trainFileList)
+        test_data = testset(dataSource,testLabelPath,testFileList)
+    
+        if train_supernet:
+    
+            dataset_size = len(train_data)
+            indices = list(range(dataset_size))
+            split = int(np.floor(0.2 * dataset_size))
+            #np.random.shuffle(indices)
+            train_indices, val_indices = indices[split:], indices[:split]
+            train_sampler = SubsetRandomSampler(train_indices)
+            valid_sampler = SubsetRandomSampler(val_indices)
+    
+            train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=train_sampler, pin_memory=True, num_workers=num_workers)
+            valid_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, sampler=valid_sampler, pin_memory=True, num_workers=num_workers)
+            test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
+    
+            return train_loader, valid_loader, test_loader ,dataSource
+        
+        else:
+    
+            train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, pin_memory=True, num_workers=num_workers)
+            test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, num_workers=num_workers)
+            return train_loader, test_loader,dataSource
+    
