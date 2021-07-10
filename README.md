@@ -287,7 +287,7 @@ python3 ezgeno.py --trainFileList ./h1hesc_dnase.training.score,./h1hesc_dnase.t
 
 ### (optional) load model and predict 
 ``` python
- python3 ezgeno.py --cuda 0 --testFileList ./h1hesc_dnase.validation.score,./h1hesc_dnase.validation_input.sequence --testLabel ./h1hesc_dnase.validation_label --eval True
+ python3 ezgeno.py --cuda 0 --eval True --testFileList ./h1hesc_dnase.validation.score,./h1hesc_dnase.validation_input.sequence --testLabel ./h1hesc_dnase.validation_label
 ``` 
 
 ### Performance Evaluation
