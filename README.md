@@ -237,7 +237,7 @@ Please refer to the ReadMe file in the preprocessing folder
  ```
 #### (optional) modify search space (convolution filter size) parameters 
 ```python
- python3 ezgeno.py --conv_filter_size_list [3,7,11,15,19]  --cuda 0 --trainFileList NFE2_training.sequence --trainLabel NFE2_training.label --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label  
+ python3 ezgeno.py --conv_filter_size_list [[3,7,11,15,19]]  --cuda 0 --trainFileList NFE2_training.sequence --trainLabel NFE2_training.label --testFileList NFE2_testing.sequence --testLabel NFE2_testing.label  
  ```
 #### (optional) modify the number of output channels parameters 
 ```python
