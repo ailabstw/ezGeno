@@ -2,13 +2,9 @@ import time
 import argparse
 import warnings
 
-from utils import *
-#from trainer import ezGenoTrainer,AcEnhancerTrainer
-#from network import ezGenoModel,AcEnhancerModel
+from utils import set_seed
+from dataset import prepare_all_data
 from trainer import ezGenoTrainer
-from network import ezGenoModel
-from dataset import *
-#from AcEnhancerDataset import *
 
 warnings.simplefilter('once', UserWarning)
 
@@ -27,74 +23,35 @@ def main():
     parser.add_argument('--momentum', type=float, default=0.9, help='momentum')
     parser.add_argument('--weight_decay', type=float, default=5e-4, help='weight decay')
 
-    parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.score", help='training file list path')
-    parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.score", help='testing file list path')
-    parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training_label", help='testing negative data path')
-    parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation_label", help='testing negative data path')
+    parser.add_argument('--trainFileList', type=str ,default="../../ezGeno_exp/v2/SUZ12.training.sequence", help='training file list path')
+    parser.add_argument('--testFileList', type=str ,default="../../ezGeno_exp/v2/SUZ12.testing.sequence", help='testing file list path')
+    parser.add_argument('--trainLabel', type=str, default="../../ezGeno_exp/v2/SUZ12.training.label", help='testing negative data path')
+    parser.add_argument('--testLabel', type=str, default="../../ezGeno_exp/v2/SUZ12.testing.label", help='testing negative data path')
     
-    
-    #parser.add_argument('--trainFileList', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training file list path')
-    """
-    parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.training.sequence", help='training file list path')
-    parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.testing.sequence", help='testing file list path')
-    parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.training.label", help='testing negative data path')
-    parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/SUZ12/SUZ12.testing.label", help='testing negative data path')
-    
-    parser.add_argument('--trainFileList', type=str ,default="../../SUZ12/SUZ12.training.sequence", help='training file list path')
-    
-    parser.add_argument('--trainFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training.score", help='training file list path')
-    parser.add_argument('--testFileList', type=str ,default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.sequence,/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation.score", help='testing file list path')
-    parser.add_argument('--trainLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.training_label", help='testing negative data path')
-    parser.add_argument('--testLabel', type=str, default="/volume/tsungting/ezgenoCode/dNase/h1hesc_dnase.validation_label", help='testing negative data path')
-    """
-    """
-    parser.add_argument('--train_pos_data_path', type=str, default="../../SUZ12/SUZ12_positive_augmentation_includeOrig_training.fa", help='training positive data path')
-    parser.add_argument('--train_neg_data_path', type=str, default="../../SUZ12/SUZ12_negative_dinuclShuffle_augmentation_includeOrig_training.fa", help='training negative data path')
-    parser.add_argument('--test_pos_data_path', type=str, default="../../SUZ12/SUZ12_positive_test.fa", help='testing positive data path')
-    parser.add_argument('--test_neg_data_path', type=str, default="../../SUZ12/SUZ12_negative_test.fa", help='testing negative data path')
-
-    parser.add_argument('--train_dNase_path', type=str, default="../../dNase/h1hesc_dnase.training.score", help='training score data path')
-    parser.add_argument('--train_seq_path', type=str, default="../../dNase/h1hesc_dnase.training_input_seq", help='training seq data path')
-    parser.add_argument('--train_label_path', type=str, default="../../dNase/h1hesc_dnase.training_label", help='training seq label path')
-    parser.add_argument('--test_dNase_path', type=str, default="../../dNase/h1hesc_dnase.validation.score", help='testing positive data path')
-    parser.add_argument('--test_seq_path', type=str, default="../../dNase/h1hesc_dnase.validation_input_seq", help='testing negative data path')
-    parser.add_argument('--test_label_path', type=str, default="../../dNase/h1hesc_dnase.validation_label", help='testing negative data path')
-
-    parser.add_argument('--layers', default=[6,6])
-    parser.add_argument('--feature_dim', type=int, default=[64,64])
-    parser.add_argument('--conv_filter_size_list', type=list, default=[[3, 7, 11, 15, 19],[3,7,11]])
-    """
     parser.add_argument('--layers', type=int ,nargs='+')
     parser.add_argument('--feature_dim', type=int, nargs='+')
     parser.add_argument('--conv_filter_size_list', type=str)
-    
-    #parser.add_argument('--task', type=str, default='TFBind', choices=['TFBind', 'AcEnhancer'])
-
     parser.add_argument('--num_workers', type=int, default=2)
-
     parser.add_argument('--cuda', type=int, default=-1)
     parser.add_argument('--eval', action='store_true', default=False)
     parser.add_argument('--load', type=str, default="model.t7", help='model to load')
     parser.add_argument('--save', type=str, default="model.t7", help='model to save')
-    parser.add_argument('--seed',help='seed number',type=int,default=0)
+    parser.add_argument('--seed', help='seed number', type=int, default=0)
 
-    args, unparsed = parser.parse_known_args()
-
+    args, _ = parser.parse_known_args()
     print(args)
     set_seed(args.seed)
 
-
-
     if args.eval:
-        test_loader,dataSource = prepareAllData(args.trainFileList,args.trainLabel,args.testFileList,args.testLabel,args.batch_size,args.num_workers,args.eval, train_supernet=True)
-        trainer = ezGenoTrainer(args,dataSource)
+        test_loader, data_source = prepare_all_data(args.trainFileList, args.trainLabel, args.testFileList, args.testLabel, args.batch_size, args.num_workers, args.eval, train_supernet=True)
+        trainer = ezGenoTrainer(args, data_source)
         print("loading model and predicting testing sequence")
         trainer.test(trainer.subnet,test_loader)
     else:
-        train_loader, valid_loader, test_loader,dataSource = prepareAllData(args.trainFileList,args.trainLabel,args.testFileList,args.testLabel,args.batch_size,args.num_workers,args.eval, train_supernet=True)
-        trainer = ezGenoTrainer(args,dataSource)
-        trainer.train(train_loader, valid_loader,test_loader, enable_stage_1=True, enable_stage_2=True, enable_stage_3=True)
-        trainer.test(trainer.subnet,test_loader)
+        train_loader, valid_loader, test_loader, data_source = prepare_all_data(args.trainFileList, args.trainLabel, args.testFileList, args.testLabel, args.batch_size, args.num_workers, args.eval, train_supernet=True)
+        trainer = ezGenoTrainer(args, data_source)
+        trainer.train(train_loader, valid_loader, test_loader, enable_stage_1=True, enable_stage_2=True, enable_stage_3=True)
+        trainer.test(trainer.subnet, test_loader)
 
 if __name__ == '__main__':
     start_time = time.time()

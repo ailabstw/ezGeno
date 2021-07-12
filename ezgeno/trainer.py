@@ -1,29 +1,17 @@
 import numpy as np
-from Bio import SeqIO
-import string
-import random
-import time
-import argparse
-import warnings
-from tqdm import tqdm
-from sklearn.metrics import roc_auc_score
-
+import os
+import json
 import copy
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
-from torch.utils.data.sampler import SubsetRandomSampler
-from torchvision import transforms
-
-from utils import *
+from sklearn.metrics import roc_auc_score
+from utils import output_arch, choose_optimizer
 from controller import Controller
 from network import ezGenoModel
-import json
-#from network import ezGenoModel,AcEnhancerModel
+
 
 class ezGenoTrainer():
-    def __init__(self, args,dataSource):
+    def __init__(self, args, data_source):
 
         self.supernet_epochs = args.supernet_epochs
         self.cstep = args.cstep
@@ -32,36 +20,35 @@ class ezGenoTrainer():
         self.save = args.save
         self.best_arch = None
         self.subnet = None
-        
-        self.weight_decay=args.weight_decay
-        self.momentum=args.momentum
-        self.optimizer=args.optimizer
-        self.controller_optimizer=args.controller_optimizer
+        self.weight_decay = args.weight_decay
+        self.momentum = args.momentum
+        self.optimizer = args.optimizer
+        self.controller_optimizer = args.controller_optimizer
 
         self.device = 'cpu' if args.cuda==-1 else 'cuda:%d'%args.cuda
-        self.dataSource = dataSource
+        self.data_source = data_source
         if not args.feature_dim:
-            self.feature_dim=[64 for i in range(len(self.dataSource)) ]
+            self.feature_dim = [64 for i in range(len(self.data_source)) ]
         else:
-            self.feature_dim=args.feature_dim
+            self.feature_dim = args.feature_dim
 
         if not args.layers:
-            self.layers=[6 for i in range(len(self.dataSource)) ]
+            self.layers = [6 for i in range(len(self.data_source)) ]
         else:
-            self.layers=args.layers
+            self.layers = args.layers
 
         if not args.conv_filter_size_list:
-            self.conv_filter_size_list=[[3, 7, 11, 15, 19] if self.dataSource[i]==1 else [3,7,11]for i in range(len(self.dataSource)) ]
+            self.conv_filter_size_list = [[3, 7, 11, 15, 19] if self.data_source[i]==1 else [3,7,11]for i in range(len(self.data_source))]
         else:
-            self.conv_filter_size_list=np.array(json.loads(args.conv_filter_size_list))
+            self.conv_filter_size_list = np.array(json.loads(args.conv_filter_size_list))
 
-        self.num_conv_choice_list=[2*len(self.conv_filter_size_list[i]) for i in range(len(self.dataSource)) ]
+        self.num_conv_choice_list = [2*len(self.conv_filter_size_list[i]) for i in range(len(self.data_source))]
 
 
-        print("self.layers",self.layers)
-        print("self.conv_filter_size_list",self.conv_filter_size_list)
-        print("self.num_conv_choice_list",self.num_conv_choice_list)
-        print("self.feature_dim",self.feature_dim)
+        print("self.layers", self.layers)
+        print("self.conv_filter_size_list", self.conv_filter_size_list)
+        print("self.num_conv_choice_list", self.num_conv_choice_list)
+        print("self.feature_dim", self.feature_dim)
 
         if args.eval and os.path.isfile(args.load):
             print("loading model {}".format(args.load))
@@ -69,11 +56,11 @@ class ezGenoTrainer():
             
         else:
             print("no checkpoint found.")
-            self.supernet = ezGenoModel(self.dataSource,self.layers, self.feature_dim,self.conv_filter_size_list,device=self.device)
-            self.controller = Controller(args, self.layers,self.num_conv_choice_list)
+            self.supernet = ezGenoModel(self.data_source, self.layers, self.feature_dim, self.conv_filter_size_list, device=self.device)
+            self.controller = Controller(args, self.layers, self.num_conv_choice_list)
         
         self.criterion = nn.BCELoss()
-        self.supernet_optimizer = choose_optimizer(self.optimizer,self.supernet,args.supernet_learning_rate,[self.weight_decay,self.momentum])
+        self.supernet_optimizer = choose_optimizer(self.optimizer, self.supernet, args.supernet_learning_rate, [self.weight_decay, self.momentum])
         self.num_choices = []
 
         for i in range(len(self.layers)):
@@ -82,13 +69,13 @@ class ezGenoTrainer():
                 self.num_choices.append(j+1)
         print("self.num_choices",self.num_choices)
         self.get_random_cand = lambda:tuple(np.random.randint(i) for i in self.num_choices)
-        self.controller_optimizer = choose_optimizer(self.controller_optimizer,self.controller,args.controller_learning_rate,[self.weight_decay,self.momentum])
+        self.controller_optimizer = choose_optimizer(self.controller_optimizer, self.controller, args.controller_learning_rate, [self.weight_decay, self.momentum])
         
         if self.subnet is not None:
-            self.subnet_optimizer = choose_optimizer(self.optimizer,self.subnet,self.learning_rate,[self.weight_decay,self.momentum])
+            self.subnet_optimizer = choose_optimizer(self.optimizer, self.subnet, self.learning_rate, [self.weight_decay, self.momentum])
         else:
             self.subnet_optimizer = None
-        self.info={'dataSource':self.dataSource,'layers':self.layers,'feature_dim':self.feature_dim,'conv_filter_size_list':self.conv_filter_size_list}
+        self.info = {'data_source':self.data_source, 'layers':self.layers, 'feature_dim':self.feature_dim, 'conv_filter_size_list':self.conv_filter_size_list}
 
 
     def train_supernet(self,model, train_loader, optimizer, criterion, epoch, get_random_cand=None, arch=None):
@@ -99,14 +86,14 @@ class ezGenoTrainer():
         all_pred = []
         for (data, target) in train_loader:
             target = target.float().to(self.device)
-            data_Device= [ data[i].float().to(self.device) for i in range(len(data)) ]
+            data_device = [ data[i].float().to(self.device) for i in range(len(data))]
             optimizer.zero_grad()
             if get_random_cand is not None:
-                output = model(data_Device, arch=get_random_cand())
+                output = model(data_device, arch=get_random_cand())
             elif arch is not None:
-                output = model(data_Device, arch=arch)
+                output = model(data_device, arch=arch)
             else:
-                output = model(data_Device)
+                output = model(data_device)
             pred = output>0.5
             correct += pred.eq(target.view_as(pred)).sum().item()
             all_label.extend(target.reshape(-1).tolist())
@@ -120,10 +107,9 @@ class ezGenoTrainer():
         print("Training acc: %.2f"%(100. * correct/len(all_pred))+"%")
         print("Train AUC score: {:.4f}".format(roc_auc_score(np.array(all_label), np.array(all_pred))))
     
-    def train_controller(self,cstep, model, controller, valid_loader, controller_optimizer):
+    def train_controller(self, cstep, model, controller, valid_loader, controller_optimizer):
         controller.train()
         model.eval()
-        avg_reward_base = None
         baseline = None
         adv_history = []
         entropy_history = []
@@ -133,7 +119,7 @@ class ezGenoTrainer():
         controller_step = 0
 
         while controller_step < cstep:
-            for batch_idx, (inputs, targets) in enumerate(valid_loader):
+            for _, (inputs, targets) in enumerate(valid_loader):
                 # sample models
                 if controller_step>=cstep:
                     break
@@ -145,11 +131,10 @@ class ezGenoTrainer():
                     targets = targets.float().to(self.device)
                     inputs_Device= [ inputs[i].float().to(self.device) for i in range(len(inputs)) ]
                     outputs = model(inputs_Device, arch=arch)
-                    predicted = outputs>0.5
                     try:
                         rewards = roc_auc_score(np.array(targets.reshape(-1).tolist()), np.array(outputs.reshape(-1).tolist()))
                     except:
-                        print("AUC error.")
+                        print("AUC calculating error. Skip current controller step.")
                 reward_history.append(rewards)
                 entropy_history.append(np_entropies)
 
@@ -184,10 +169,10 @@ class ezGenoTrainer():
         all_pred = []
         for (data, target) in train_loader:
             target = target.float().to(self.device)
-            data_Device= [ data[i].float().to(self.device) for i in range(len(data)) ]
+            data_device = [data[i].float().to(self.device) for i in range(len(data))]
             
             optimizer.zero_grad()
-            output = model(data_Device, arch=arch)
+            output = model(data_device, arch=arch)
             pred = output>0.5
             correct += pred.eq(target.view_as(pred)).sum().item()
             all_label.extend(target.reshape(-1).tolist())
@@ -209,11 +194,11 @@ class ezGenoTrainer():
         tp, tn, fp, fn = 0, 0, 0, 0
         all_label = []
         all_pred = []
-        for batch_idx, (data, target) in enumerate(test_loader):
+        for _, (data, target) in enumerate(test_loader):
             target = target.float().to(self.device)
-            data_Device= [ data[i].float().to(self.device) for i in range(len(data)) ]         
+            data_device = [data[i].float().to(self.device) for i in range(len(data))]         
             
-            output = model(data_Device, arch=self.best_arch)
+            output = model(data_device, arch=self.best_arch)
             pred = output>0.5
             correct += pred.eq(target.view_as(pred)).sum().item()
             for p, t in zip(pred, target.view_as(pred)):
@@ -231,12 +216,12 @@ class ezGenoTrainer():
         print("Test AUC score: {:.4f}\n".format(roc_auc_score(np.array(all_label), np.array(all_pred))))
         return roc_auc_score(np.array(all_label), np.array(all_pred))
 
-    def train(self, train_loader, valid_loader, test_loader,enable_stage_1=True, enable_stage_2=True, enable_stage_3=True):
+    def train(self, train_loader, valid_loader, test_loader, enable_stage_1=True, enable_stage_2=True, enable_stage_3=True):
         ''' stage 1: train supernet '''
         if enable_stage_1:
             self.supernet = self.supernet.to(self.device)
             for epoch in range(1, self.supernet_epochs):
-                self.train_supernet( self.supernet , train_loader, self.supernet_optimizer, self.criterion, epoch, self.get_random_cand)
+                self.train_supernet(self.supernet, train_loader, self.supernet_optimizer, self.criterion, epoch, self.get_random_cand)
 
         ''' stage 2: train controller '''
         if enable_stage_2:
@@ -247,9 +232,9 @@ class ezGenoTrainer():
             
             self.best_arch = self.controller.sample(is_train=False)
             print("self.best_arch",self.best_arch)
-            outputArch(self.best_arch,self.conv_filter_size_list,self.layers)
+            output_arch(self.best_arch, self.conv_filter_size_list, self.layers)
 
-            self.subnet = ezGenoModel(self.dataSource,self.layers, self.feature_dim,self.conv_filter_size_list,device=self.device,arch=self.best_arch)
+            self.subnet = ezGenoModel(self.data_source,self.layers, self.feature_dim,self.conv_filter_size_list,device=self.device,arch=self.best_arch)
             self.subnet_optimizer = choose_optimizer(self.optimizer,self.subnet,self.learning_rate,[self.weight_decay,self.momentum])
 
         ''' stage 3: train from scratch '''
@@ -259,16 +244,16 @@ class ezGenoTrainer():
             else:
                 self.subnet = self.subnet.to(self.device)
                 model_check_epoch = copy.deepcopy(self.subnet)
-                optimizer_check_epoch = choose_optimizer(self.optimizer,model_check_epoch,self.learning_rate,[self.weight_decay,self.momentum])
-                valid_auc_list=[]
-                best_valid_auc=0
-                for epoch in range(1, self.epochs):
+                optimizer_check_epoch = choose_optimizer(self.optimizer, model_check_epoch, self.learning_rate, [self.weight_decay, self.momentum])
+                valid_auc_list = []
+                best_valid_auc = 0
+                for epoch in range(1, self.epochs+1):
                     self.train_subnet(model_check_epoch, train_loader, optimizer_check_epoch, self.criterion, epoch, arch=self.best_arch)
                     valid_auc = self.test(model_check_epoch, valid_loader)
                     valid_auc_list.append(valid_auc)
-                    print("valid_auc:",valid_auc)
+                    print("valid_auc:", valid_auc)
                     if valid_auc>best_valid_auc:
-                        best_epoch=epoch
+                        best_epoch = epoch
                         best_valid_auc = valid_auc
                     try:
                         if (valid_auc_list[-3] - valid_auc_list[-1]) > 0.003:
@@ -287,20 +272,20 @@ class ezGenoTrainer():
 
     def load_model(self, args):
         checkpoint = torch.load(args.load)
-        self.best_arch= checkpoint["best_arch"]
-        self.info= checkpoint["info"]
+        self.best_arch = checkpoint["best_arch"]
+        self.info = checkpoint["info"]
         self.feature_dim = self.info["feature_dim"]
-        self.conv_filter_size_list= self.info["conv_filter_size_list"]
-        self.layers= self.info["layers"]
+        self.conv_filter_size_list = self.info["conv_filter_size_list"]
+        self.layers = self.info["layers"]
 
-        self.supernet = ezGenoModel(self.dataSource,self.layers, self.feature_dim,self.conv_filter_size_list,device=self.device)
+        self.supernet = ezGenoModel(self.data_source, self.layers, self.feature_dim, self.conv_filter_size_list, device=self.device)
         self.controller = Controller(args,self.layers, self.num_conv_choice_list)
 
         self.load_supernet(checkpoint)
         self.load_controller(checkpoint)
         
         if self.best_arch is not None:
-            self.subnet = ezGenoModel(self.dataSource,self.layers, self.feature_dim,self.conv_filter_size_list,arch=self.best_arch,device=self.device)
+            self.subnet = ezGenoModel(self.data_source, self.layers, self.feature_dim, self.conv_filter_size_list, arch=self.best_arch, device=self.device)
         self.load_subnet(checkpoint)
 
     def save_model(self,info):

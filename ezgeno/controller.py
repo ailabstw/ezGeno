@@ -3,23 +3,22 @@ import torch.nn.functional as F
 import utils
 
 class Controller(torch.nn.Module):
-    def __init__(self, args,layersList,num_of_conv_choices_list):
+    def __init__(self, args, layers_list, num_of_conv_choices_list):
         torch.nn.Module.__init__(self)
         self.args = args
         self.controller_hid = 100
-
-        self.layersList=layersList
-        self.num_of_conv_choices_list=num_of_conv_choices_list
-        print("layersList",layersList)
-        print("self.num_of_conv_choices_list",self.num_of_conv_choices_list)
-        print("max(self.num_of_conv_choices_list)",max(self.num_of_conv_choices_list))
+        self.layers_list = layers_list
+        self.num_of_conv_choices_list = num_of_conv_choices_list
+        print("layers_list", layers_list)
+        print("self.num_of_conv_choices_list", self.num_of_conv_choices_list)
+        print("max(self.num_of_conv_choices_list)", max(self.num_of_conv_choices_list))
         self.encoder = torch.nn.Embedding(max(self.num_of_conv_choices_list), self.controller_hid)
         self.lstm = torch.nn.LSTMCell(self.controller_hid, self.controller_hid)
 
         self.decoders = []
 
-        for i in range(len(self.layersList)):
-            for j in range(self.layersList[i]):
+        for i in range(len(self.layers_list)):
+            for j in range(self.layers_list[i]):
                 decoder = torch.nn.Linear(self.controller_hid, self.num_of_conv_choices_list[i])
                 self.decoders.append(decoder)
                 decoder = torch.nn.Linear(self.controller_hid, j+1)
@@ -31,10 +30,9 @@ class Controller(torch.nn.Module):
         self.static_init_hidden = utils.keydefaultdict(self.init_hidden)
 
         def _get_default_hidden(key):
-            return utils.get_variable(
-                torch.zeros(key, self.controller_hid),
-                self.args.cuda,
-                requires_grad=False)
+            return utils.get_variable(torch.zeros(key, self.controller_hid),
+                                      self.args.cuda,
+                                      requires_grad=False)
 
         self.static_inputs = utils.keydefaultdict(_get_default_hidden)
 
@@ -76,14 +74,14 @@ class Controller(torch.nn.Module):
         policy = []
         
         total_layers=0
-        for i in range(len(self.layersList)):
-            total_layers+=self.layersList[i]
+        for i in range(len(self.layers_list)):
+            total_layers+=self.layers_list[i]
         for block_idx in range(total_layers*2):###
             logits, hidden = self.forward(inputs,
                                           hidden,
                                           block_idx,
                                           is_embed=(block_idx == 0),
-                                        is_train=(True and is_train))
+                                          is_train=(True and is_train))
 
             probs = F.softmax(logits, dim=-1)
 

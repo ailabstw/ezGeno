@@ -1,15 +1,9 @@
-import os
-import sys
-import time
-import math
 import numpy as np
 import random
-
 import torch
 import torch.nn as nn
 import torch.nn.init as init
 from torch.autograd import Variable
-import shutil
 from collections import defaultdict
 
 def get_variable(inputs, cuda=False, **kwargs):
@@ -37,7 +31,7 @@ def get_mean_and_std(dataset):
     mean = torch.zeros(3)
     std = torch.zeros(3)
     print('==> Computing mean and std..')
-    for inputs, targets in dataloader:
+    for inputs, _ in dataloader:
         for i in range(3):
             mean[i] += inputs[:,i,:,:].mean()
             std[i] += inputs[:,i,:,:].std()
@@ -71,7 +65,6 @@ def onehot_encode_sequences(sequences):
             else:
                 arr[i, mapping[letter]] = 1.0
         onehot.append(arr)
-        #onehot.append(arr.T)
     return onehot
 
 def choose_optimizer(optimizerName,model,learning_rate,parameters_list):
@@ -100,11 +93,9 @@ def set_seed(seed: int):
     #torch.backends.cudnn.deterministic = True
     #torch.backends.cudnn.benchmark = False
 
-def outputArch(arch,conv_filter_size_list,layers):
+def output_arch(arch, conv_filter_size_list, layers):
     print("the Architecture of the network we choosed is:")
     print("==============================================")
-    #arch[2*arch_count:2*(arch_count+layers[i])]
-    #arch_count+=self.layers[i]
     arch_count=0
     for i in range(len(layers)):
         for index in range(2*arch_count,2*(arch_count+layers[i])):
@@ -114,7 +105,7 @@ def outputArch(arch,conv_filter_size_list,layers):
                     print("conv:{}".format(conv_filter_size_list[i][arch[index]//2]))
                 else:
                     print("conv:{} + dilation".format(conv_filter_size_list[i][arch[index]//2]))
-            #connect layer
+            # connect layer
             else:
                 if arch[index]==0:
                     print("no connection layer added")
