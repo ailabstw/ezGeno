@@ -265,12 +265,13 @@ def show_grad_cam(args, model_path, data_name, model, use_cuda, window=9):
             out_seq_text[i, :] = all_seq_text[max_pred_index_list[i], :]
             out_mask[i, :] = all_mask[max_pred_index_list[i], :]
     else:
-        range_list = re.findall(r'(\d+)-(\d+)', args.show_seq)
-        range_end = range_list[1]
-        range_start = range_list[0]
+        range_list = re.findall(r'(\d+)', args.show_seq)
+        range_end = int(range_list[1])
+        range_start = int(range_list[0])
+        #[range_start,range_end] = re.findall(r'(\d+)-(\d+)', args.show_seq)
         out_mask = all_mask[range_start:range_end, :]
         out_seq_text = all_seq_text[range_start:range_end, :]
-        chosen_index_list = [i for i in range(start, end)]
+        chosen_index_list = [i for i in range(range_start, range_end)]
 
     write_heatmap('{}_seq_pos_heatmap.pdf'.format(data_name), out_mask, out_seq_text)
     write_sub_seq_file('{}_sequence_logo.fa'.format(data_name), seq_pos_list_pair, pred_list, all_seq_text, chosen_index_list)
