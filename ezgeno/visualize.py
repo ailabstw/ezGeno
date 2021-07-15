@@ -1,5 +1,4 @@
-import os
-import sys
+import re
 import time
 import math
 import numpy as np
@@ -8,19 +7,18 @@ import argparse
 
 import torch
 import torch.nn as nn
-import torch.nn.init as init
-from torch.autograd import Variable
 from network import ezGenoModel
-from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
-from utils import *
+from torch.utils.data import Dataset
+from utils import onehot_encode_sequences
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 import matplotlib
 import matplotlib.cm as cm
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from matplotlib.backends.backend_pdf import PdfPages
 import heapq
+import ast
 
 class FeatureExtractor():
     def __init__(self, model, target_layers):
@@ -35,14 +33,14 @@ class FeatureExtractor():
         outputs = []
         self.gradients = []
 
-        x =self.model.bn(x)
+        x = self.model.bn[0](x)
         x = x.squeeze(0)
         feature_maps = []
-        i=0
+        i = 0
 
-        for name, module in self.model.features._modules.items():
-            block_id=self.model.arch[2*i]
-            connect_id=self.model.arch[2*i+1]
+        for name, module in self.model.features[0]._modules.items():
+            block_id = self.model.arch[2*i]
+            connect_id = self.model.arch[2*i+1]
             x = module[block_id](x)
             if connect_id!=0:
                 y = feature_maps[connect_id-1]
@@ -51,9 +49,9 @@ class FeatureExtractor():
                 x.register_hook(self.save_gradient)
                 outputs += [x]
             feature_maps.append(x)
-            i=i+1
+            i = i+1
 
-        x=self.model.globalpooling(x)
+        x = self.model.globalpooling[0](x)
         return outputs, x
 
 
@@ -72,13 +70,15 @@ class ModelOutputs():
         return target_activations, output
 
 class GradCam:
-    def __init__(self, model, target_layer_names,seq_length, use_cuda):
+    def __init__(self, model, target_layer_names, seq_length, use_cuda):
         self.model = model
         self.model.eval()
         self.cuda = use_cuda
-        self.seq_length =seq_length
+        self.seq_length = seq_length
         if self.cuda:
             self.model = model.cuda()
+            #only for one input file
+            self.model.bn[0] = model.bn[0].cuda()
 
         self.extractor = ModelOutputs(self.model, target_layer_names)
 
@@ -122,7 +122,7 @@ class GradCam:
         cam = cv2.resize(cam, (self.seq_length, 1))
         cam = cam - np.min(cam)
         cam = cam / (np.max(cam)+0.001)
-        return output,cam
+        return output, cam
 
 class gradCamTestset(Dataset):
     def __init__(self, data_path):
@@ -145,101 +145,102 @@ class gradCamTestset(Dataset):
         data = np.expand_dims(data, axis=0)
         label = self.test_labels[index]
         seq = self.test_seq[index]
-        return data, label ,seq
+        return data, label, seq
 
     def __len__(self):
         return len(self.encoded_test)
 
 def pattern_avg_pooling(x,window):
-    pooling = nn.AvgPool1d(window, stride=1,padding=window//2)
-    x=x.unsqueeze(0)
-    x=pooling(x)
+    pooling = nn.AvgPool1d(window, stride=1, padding=window//2)
+    x = x.unsqueeze(0)
+    x = pooling(x)
     return x
 
-def get_sub_seq(idx,pos_list,seq_length,window=9):
-    j=0
-    seq_pos_list_pair=[]
+def get_sub_seq(idx, pos_list, seq_length, window=9):
+    j = 0
+    seq_pos_list_pair = []
     while j <= len(pos_list)-1:
         left  = max(pos_list[j]-window//2,0)
         right = min(pos_list[j]+window//2,seq_length-1)
-        flag=True
+        flag = True
         if j==len(pos_list)-1:
-            flag=False
+            flag = False
         while flag:
             if right > pos_list[j+1]-window//2:
-                right= pos_list[j+1]+window//2
-                j=j+1
+                right = pos_list[j+1]+window//2
+                j = j+1
             else:
-                flag=False
+                flag = False
             if j==len(pos_list)-1:
-                flag=False
-        j=j+1
-        seq_pos_list_pair.append([idx,left,right])
+                flag = False
+        j = j+1
+        seq_pos_list_pair.append([idx, left, right])
 
     return seq_pos_list_pair
 
 
 
-def write_sub_seq_file(filename,seq_pos_list_pair,pred_list,all_seq_text,chosen_index_list):
-    with open(filename,'w') as fout:
+def write_sub_seq_file(filename, seq_pos_list_pair, pred_list, all_seq_text, chosen_index_list):
+    with open(filename, 'w') as fout:
         if chosen_index_list is None:   
-            for (seq_pos,start,end) in seq_pos_list_pair:         
-                seq="".join(all_seq_text[seq_pos,start:end+1])
-                fout.write('>seq_{}_{}_{}_{}\n'.format(seq_pos,start,end,pred_list[seq_pos]))
+            for (seq_pos, start, end) in seq_pos_list_pair:         
+                seq="".join(all_seq_text[seq_pos, start:end+1])
+                fout.write('>seq_{}_{}_{}_{}\n'.format(seq_pos, start, end, pred_list[seq_pos]))
                 fout.write(seq+'\n')
         else:
-            for (seq_pos,start,end) in seq_pos_list_pair:
+            for (seq_pos, start, end) in seq_pos_list_pair:
                 if seq_pos in chosen_index_list:    
-                    seq="".join(all_seq_text[seq_pos,start:end+1])
-                    fout.write('>seq_{}_{}_{}_{}\n'.format(seq_pos,start,end,pred_list[seq_pos]))
+                    seq="".join(all_seq_text[seq_pos, start:end+1])
+                    fout.write('>seq_{}_{}_{}_{}\n'.format(seq_pos, start, end, pred_list[seq_pos]))
                     fout.write(seq+'\n')
 
-def write_heatmap(filename,mask,seq):
+def write_heatmap(filename, mask, seq):
     with PdfPages(filename) as pdf:
-        num_of_seqs=mask.shape[0]
-        seq_length=mask.shape[1]
-        print("num_of_seqs",num_of_seqs)
-        print("seq_length",seq_length)
+        num_of_seqs = mask.shape[0]
+        seq_length = mask.shape[1]
+        print("num_of_seqs", num_of_seqs)
+        print("seq_length", seq_length)
         for i in range(math.ceil(num_of_seqs/100)):
             plt.figure(figsize=(seq_length, 100))
-            end=min(i*100+100,num_of_seqs)
-            sns.heatmap(mask[i*100:end],fmt='',cmap=cm.Blues, annot=seq[i*100:end,],annot_kws={'size':35},linewidths = 0.02,cbar=False)
+            end = min(i*100+100, num_of_seqs)
+            sns.heatmap(mask[i*100:end], fmt='', cmap=cm.Blues, annot=seq[i*100:end,], annot_kws={'size':35}, linewidths=0.02, cbar=False)
             plt.title('Page {}'.format(i+1))
             pdf.savefig()  # saves the current figure into a pdf page
             plt.close()
 
-def show_grad_cam(args,model_path,dataName,model,window=9):
+def show_grad_cam(args, model_path, data_name, model, use_cuda, window=9):
     print("show_grad_cam")
-    fo = open("{}_grad_cam.csv".format(dataName), "w")
+    fo = open("{}_grad_cam.csv".format(data_name), "w")
     test_data = gradCamTestset(args.data_path)
-    seq_length=test_data.seq_length
+    #test_data = testset(args.dataSource,testLabelPath,testFileList)
+    seq_length = test_data.seq_length
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, num_workers=8)
-    grad_cam = GradCam(model=model, target_layer_names=args.target_layer_names,seq_length=seq_length, use_cuda=True)
+    grad_cam = GradCam(model=model, target_layer_names=args.target_layer_names, seq_length=seq_length, use_cuda=True)
     target_index = None
     
-    pred_list=[]
-    seq_pos_list=[]
-    seq_pos_list_pair=[]
-    grad_cam_score_list=[]
+    pred_list = []
+    seq_pos_list = []
+    seq_pos_list_pair = []
+    grad_cam_score_list = []
 
-    all_seq_text=np.empty([len(test_loader), seq_length], dtype = str)
-    all_mask=np.zeros((len(test_loader),seq_length))
-    for idx, (data, target,seq) in enumerate(test_loader):
+    all_seq_text = np.empty([len(test_loader), seq_length], dtype=str)
+    all_mask = np.zeros((len(test_loader),seq_length))
+    for idx, (data, _, seq) in enumerate(test_loader):
         seq_text = np.asarray([[s for s in seq[i]] for i in range(len(seq))])
         output,mask = grad_cam(data, target_index)
 
-        all_seq_text[idx,:]=seq_text
-        all_mask[idx,:]=mask
+        all_seq_text[idx,:] = seq_text
+        all_mask[idx,:] = mask
 
         tensor_mask = torch.Tensor(mask)
-        pooling_res=pattern_avg_pooling(tensor_mask,window)
-        pooling_res=pooling_res.squeeze()
+        pooling_res = pattern_avg_pooling(tensor_mask, window)
+        pooling_res = pooling_res.squeeze()
         pred_list.append(output)
         
-        res=np.where(np.array(pooling_res) >= 0.25)
-        pos_list=res[0]
+        res = np.where(np.array(pooling_res)>=0.25)
+        pos_list = res[0]
         
-        seq_pos_list_pair.extend(get_sub_seq(idx,pos_list,seq_length,window))
+        seq_pos_list_pair.extend(get_sub_seq(idx, pos_list, seq_length, window))
         seq_pos_list.append(pos_list)
 
         mask = mask[0].tolist()
@@ -248,33 +249,32 @@ def show_grad_cam(args,model_path,dataName,model,window=9):
 
     fo.close()
 
-    chosen_index_list=None
+    chosen_index_list = None
     if args.show_seq=="all":
-        out_mask=all_mask
-        out_seq_text=all_seq_text
+        out_mask = all_mask
+        out_seq_text = all_seq_text
     
     elif args.show_seq.startswith('top'):  
         num = re.findall(r'top-(\d+)',args.show_seq)[0]
         top_pred_res = heapq.nlargest(num, enumerate(pred_list), key=lambda x:x[1])
-        max_pred_index_list,_ = zip(*top_pred_res)
-        chosen_index_list=max_pred_index_list
-        pred_top_seq=np.empty([num, seq_length], dtype = str)
-        pred_top_100_gradcam=np.empty([num, seq_length], dtype = float)
+        max_pred_index_list, _ = zip(*top_pred_res)
+        chosen_index_list = max_pred_index_list
+        pred_top_seq = np.empty([num, seq_length], dtype = str)
+        pred_top_100_gradcam = np.empty([num, seq_length], dtype = float)
         for i in range(num):
-            out_seq_text[i,:]=all_seq_text[max_pred_index_list[i],:]
-            out_mask[i,:]=all_mask[max_pred_index_list[i],:]
+            out_seq_text[i, :] = all_seq_text[max_pred_index_list[i], :]
+            out_mask[i, :] = all_mask[max_pred_index_list[i], :]
     else:
         range_list = re.findall(r'(\d+)', args.show_seq)
         range_end = int(range_list[1])
         range_start = int(range_list[0])
-        range_end =range_list[1]
-        range_start = range_list[0]
-        out_mask=all_mask[range_start:range_end,:]
-        out_seq_text=all_seq_text[range_start:range_end,:]
-        chosen_index_list=[i for i in range(range_start,range_end)]
+        #[range_start,range_end] = re.findall(r'(\d+)-(\d+)', args.show_seq)
+        out_mask = all_mask[range_start:range_end, :]
+        out_seq_text = all_seq_text[range_start:range_end, :]
+        chosen_index_list = [i for i in range(range_start, range_end)]
 
-    write_heatmap('{}_seq_pos_heatmap.pdf'.format(dataName),out_mask,out_seq_text)
-    write_sub_seq_file('{}_sequence_logo.fa'.format(dataName),seq_pos_list_pair,pred_list,all_seq_text,chosen_index_list)
+    write_heatmap('{}_seq_pos_heatmap.pdf'.format(data_name), out_mask, out_seq_text)
+    write_sub_seq_file('{}_sequence_logo.fa'.format(data_name), seq_pos_list_pair, pred_list, all_seq_text, chosen_index_list)
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -283,18 +283,18 @@ if __name__ == '__main__':
     parser.add_argument('--show_seq', type=str, default="all", help='all ,top-100 ,30-100')
     parser.add_argument('--load', type=str, default="./model.t7", help='from model to predict seq')
     parser.add_argument('--data_path', type=str, default="../SUZ12/SUZ12_positive_test.fa", help='input data')
-    parser.add_argument('--dataName', type=str, default="SUZ12", help='from model to predict seq')
+    parser.add_argument('--data_name', type=str, default="SUZ12", help='from model to predict seq')
     parser.add_argument('--target_layer_names', type=str, default="[2]", help='want to extract features from target layers')
+    parser.add_argument('--use_cuda',help='True or False flag, input should be either "True" or "False".', type=ast.literal_eval, default=True, dest='use_cuda')
 
     args, unparsed = parser.parse_known_args()
     print(args)
 
     checkpoint = torch.load(args.load)
-    info=checkpoint["info"]
-    model=ezGenoModel(arch=checkpoint["best_arch"],layers=info["layers"], feature_dim=info["feature_dim"])
+    info = checkpoint["info"]
+    model = ezGenoModel(data_source=info["data_source"], arch=checkpoint["best_arch"], layers=info["layers"], feature_dim=info["feature_dim"], conv_filter_size_list=info["conv_filter_size_list"])
     
-
-    show_grad_cam(args,args.load,args.dataName,model)
+    show_grad_cam(args,args.load, args.data_name, model, args.use_cuda)
     end_time = time.time()
     duration = end_time - start_time
     print("total time: %.3fs"%(duration))

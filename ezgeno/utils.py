@@ -1,14 +1,9 @@
-import os
-import sys
-import time
-import math
 import numpy as np
-
+import random
 import torch
 import torch.nn as nn
 import torch.nn.init as init
 from torch.autograd import Variable
-import shutil
 from collections import defaultdict
 
 def get_variable(inputs, cuda=False, **kwargs):
@@ -36,7 +31,7 @@ def get_mean_and_std(dataset):
     mean = torch.zeros(3)
     std = torch.zeros(3)
     print('==> Computing mean and std..')
-    for inputs, targets in dataloader:
+    for inputs, _ in dataloader:
         for i in range(3):
             mean[i] += inputs[:,i,:,:].mean()
             std[i] += inputs[:,i,:,:].std()
@@ -70,7 +65,6 @@ def onehot_encode_sequences(sequences):
             else:
                 arr[i, mapping[letter]] = 1.0
         onehot.append(arr)
-        #onehot.append(arr.T)
     return onehot
 
 def choose_optimizer(optimizerName,model,learning_rate,parameters_list):
@@ -84,20 +78,38 @@ def choose_optimizer(optimizerName,model,learning_rate,parameters_list):
         optimizer = torch.optim.Adagrad(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     return optimizer
 
-def outputArch(arch,conv_filter_size_list):
+def set_seed(seed: int):
+    """
+    Helper function for reproducible behavior to set the seed in ``random``, ``numpy``, ``torch`` and/or ``tf`` (if
+    installed).
+
+    Args:
+        seed (:obj:`int`): The seed to set.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    #torch.backends.cudnn.deterministic = True
+    #torch.backends.cudnn.benchmark = False
+
+def output_arch(arch, conv_filter_size_list, layers):
     print("the Architecture of the network we choosed is:")
     print("==============================================")
-    for index in range(len(arch)):
-        # conv layer
-        if (index%2)==0:
-            if arch[index]%2==0:
-                print("conv:{}".format(conv_filter_size_list[arch[index]//2]))
+    arch_count=0
+    for i in range(len(layers)):
+        for index in range(2*arch_count,2*(arch_count+layers[i])):
+            # conv layer
+            if (index%2)==0:
+                if arch[index]%2==0:
+                    print("conv:{}".format(conv_filter_size_list[i][arch[index]//2]))
+                else:
+                    print("conv:{} + dilation".format(conv_filter_size_list[i][arch[index]//2]))
+            # connect layer
             else:
-                print("conv:{} + dilation".format(conv_filter_size_list[arch[index]//2]))
-        #connect layer
-        else:
-            if arch[index]==0:
-                print("no connection layer added")
-            else:
-                print("connect layer {}".format(arch[index]))
+                if arch[index]==0:
+                    print("no connection layer added")
+                else:
+                    print("connect layer {}".format(arch[index]))
+        arch_count+=layers[i]
     print("==============================================")

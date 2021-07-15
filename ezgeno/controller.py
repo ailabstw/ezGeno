@@ -3,32 +3,26 @@ import torch.nn.functional as F
 import utils
 
 class Controller(torch.nn.Module):
-    def __init__(self, args,deepbind_num_of_conv_choices,deepbind_layers,score_num_of_conv_choices=0,score_layers=0):
+    def __init__(self, args, layers_list, num_of_conv_choices_list):
         torch.nn.Module.__init__(self)
         self.args = args
         self.controller_hid = 100
-
-        self.deepbind_num_of_conv_choices=deepbind_num_of_conv_choices
-        self.deepbind_layers=deepbind_layers
-        self.score_num_of_conv_choices=score_num_of_conv_choices
-        self.score_layers=score_layers
-
-        self.encoder = torch.nn.Embedding(deepbind_num_of_conv_choices, self.controller_hid)
+        self.layers_list = layers_list
+        self.num_of_conv_choices_list = num_of_conv_choices_list
+        print("layers_list", layers_list)
+        print("self.num_of_conv_choices_list", self.num_of_conv_choices_list)
+        print("max(self.num_of_conv_choices_list)", max(self.num_of_conv_choices_list))
+        self.encoder = torch.nn.Embedding(max(self.num_of_conv_choices_list), self.controller_hid)
         self.lstm = torch.nn.LSTMCell(self.controller_hid, self.controller_hid)
 
         self.decoders = []
 
-        for i in range(self.deepbind_layers):
-            decoder = torch.nn.Linear(self.controller_hid, self.deepbind_num_of_conv_choices)
-            self.decoders.append(decoder)
-            decoder = torch.nn.Linear(self.controller_hid, i+1)
-            self.decoders.append(decoder)
-            
-        for i in range(self.score_layers):
-            decoder = torch.nn.Linear(self.controller_hid, self.score_num_of_conv_choices)
-            self.decoders.append(decoder)
-            decoder = torch.nn.Linear(self.controller_hid, i+1)
-            self.decoders.append(decoder)    
+        for i in range(len(self.layers_list)):
+            for j in range(self.layers_list[i]):
+                decoder = torch.nn.Linear(self.controller_hid, self.num_of_conv_choices_list[i])
+                self.decoders.append(decoder)
+                decoder = torch.nn.Linear(self.controller_hid, j+1)
+                self.decoders.append(decoder)    
 
         self._decoders = torch.nn.ModuleList(self.decoders)
 
@@ -36,10 +30,9 @@ class Controller(torch.nn.Module):
         self.static_init_hidden = utils.keydefaultdict(self.init_hidden)
 
         def _get_default_hidden(key):
-            return utils.get_variable(
-                torch.zeros(key, self.controller_hid),
-                self.args.cuda,
-                requires_grad=False)
+            return utils.get_variable(torch.zeros(key, self.controller_hid),
+                                      self.args.cuda,
+                                      requires_grad=False)
 
         self.static_inputs = utils.keydefaultdict(_get_default_hidden)
 
@@ -80,13 +73,15 @@ class Controller(torch.nn.Module):
         log_probs = []
         policy = []
         
-        total_layers=self.deepbind_layers+self.score_layers
+        total_layers=0
+        for i in range(len(self.layers_list)):
+            total_layers+=self.layers_list[i]
         for block_idx in range(total_layers*2):###
             logits, hidden = self.forward(inputs,
                                           hidden,
                                           block_idx,
                                           is_embed=(block_idx == 0),
-                                        is_train=(True and is_train))
+                                          is_train=(True and is_train))
 
             probs = F.softmax(logits, dim=-1)
 
@@ -99,8 +94,10 @@ class Controller(torch.nn.Module):
             else:
                 action = probs.argmax(dim=1, keepdim=True)
             policy.append(action.item())
+
             selected_log_prob = log_prob.gather(
                 1, utils.get_variable(action, self.args.cuda, requires_grad=False))
+
 
             entropies.append(entropy)
             log_probs.append(selected_log_prob[:, 0])
