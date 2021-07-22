@@ -249,9 +249,8 @@ Please refer to the ReadMe file in the preprocessing folder
 ```
 ### Performance evaluaion:
 
-![AUC curve](https://github.com/ailabstw/ezGeno/blob/master/model_comparision.png)
+![model comparison](https://github.com/ailabstw/ezGeno/blob/master/tfbind.jpg)
 
-![time cost](https://github.com/ailabstw/ezGeno/blob/master/compare_with_methods_time.png)
 
 ### 3. visualize and get sub sequence based on prediction model 
 ```python
@@ -291,7 +290,5 @@ python3 ezgeno.py --trainFileList ./h1hesc_dnase.training.score,./h1hesc_dnase.t
 ``` 
 
 ### Performance Evaluation
-![AUC curve](https://github.com/ailabstw/ezGeno/blob/master/active_enhancer_AUC.png)
-
-![time cost](https://github.com/ailabstw/ezGeno/blob/master/active_enhancer_time.png)
+![model comparison](https://github.com/ailabstw/ezGeno/blob/master/enhancer.jpg)
 
