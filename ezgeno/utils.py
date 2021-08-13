@@ -6,12 +6,12 @@ import torch.nn.init as init
 from torch.autograd import Variable
 from collections import defaultdict
 
-def get_variable(inputs, cuda=False, **kwargs):
+def get_variable(inputs, cuda=-1, **kwargs):
     if type(inputs) in [list, np.ndarray]:
         inputs = torch.Tensor(inputs)
         
     if cuda==-1:
-        out = Variable(inputs.cuda(), **kwargs)
+        out = Variable(inputs, **kwargs)
     else:
         out = Variable(inputs.to('cuda:%d'%cuda), **kwargs)
     return out

@@ -215,7 +215,7 @@ def show_grad_cam(args, model_path, data_name, model, use_cuda, window=9):
     #test_data = testset(args.dataSource,testLabelPath,testFileList)
     seq_length = test_data.seq_length
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, num_workers=8)
-    grad_cam = GradCam(model=model, target_layer_names=args.target_layer_names, seq_length=seq_length, use_cuda=True)
+    grad_cam = GradCam(model=model, target_layer_names=args.target_layer_names, seq_length=seq_length, use_cuda=use_cuda)
     target_index = None
     
     pred_list = []
