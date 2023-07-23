@@ -17,7 +17,7 @@ seaborn==0.10.1
 six==1.15.0
 sklearn==0.0
 threadpoolctl==2.1.0
-torch==1.5.1
+torch==1.13.1
 torchvision==0.6.1
 tqdm==4.48.0
 utils==1.0.1
